@@ -1,56 +1,290 @@
-import{readFileSync,writeFileSync,mkdirSync,copyFileSync,existsSync}from'node:fs';
-import{execFileSync}from'node:child_process';
-import{randomUUID,createHash}from'node:crypto';
-import webpush from'web-push';
-import{fetchPickup}from'./apple.mjs';
-import{applyObservations,currentAlert}from'./stock.mjs';
-import{STORES,VARIANTS,watchKey,emptySnapshot,POLL_MS}from'./config.mjs';
-const github=process.env.GITHUB_ACTIONS==='true';
-const config=JSON.parse(readFileSync('site-config.json','utf8'));
-let state=existsSync('state.json')?JSON.parse(readFileSync('state.json','utf8')):{snapshot:emptySnapshot(),history:[],pending:[],lastPush:null};
-const now=Date.now();
-let observations;
-try{observations=await fetchPickup();}catch(error){const message=error instanceof Error?error.message:'Source request failed';observations=STORES.flatMap(s=>VARIANTS.map(v=>({key:watchKey(s.id,v.id),status:'unknown',quote:'Check failed',pickup:'',error:message})));}
-const{snapshot,alerts}=applyObservations(state.snapshot,observations,now);
-state.snapshot=snapshot;state.history=[{at:now,verified:observations.filter(o=>o.status!=='unknown').length,error:snapshot.lastError},...state.history].slice(0,20);
-for(const alert of alerts)state.pending.push({id:randomUUID(),alert,at:now,expiresAt:now+(alert.type==='stock'?POLL_MS:3600000),accepted:[]});
-if(process.env.SEND_TEST==='true')state.pending.push({id:randomUUID(),alert:{type:'test',title:'Duo Watch is connected',body:'Test notification only. Your iPhone can receive pickup alerts from the free cloud tracker.',url:config.siteUrl,items:[]},at:now,expiresAt:now+POLL_MS,accepted:[]});
-function persist(message){
-  writeFileSync('state.json',JSON.stringify(state,null,2)+'\n');
-  if(github){execFileSync('git',['config','user.name','github-actions[bot]']);execFileSync('git',['config','user.email','41898282+github-actions[bot]@users.noreply.github.com']);execFileSync('git',['add','state.json']);try{execFileSync('git',['diff','--cached','--quiet']);}catch{execFileSync('git',['commit','-m',message],{stdio:'ignore'});execFileSync('git',['push','origin','HEAD:main'],{stdio:'ignore'});}}
+import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { randomUUID, createHash } from "node:crypto";
+import webpush from "web-push";
+import { fetchPickup } from "./apple.mjs";
+import { applyObservations, currentAlert } from "./stock.mjs";
+import { STORES, VARIANTS, watchKey, emptySnapshot, POLL_MS } from "./config.mjs";
+
+const HISTORY_LIMIT = 20;
+const PENDING_LIMIT = 24;
+const HEALTH_ALERT_TTL_MS = 60 * 60_000;
+const MAX_PUSH_ATTEMPTS = 3;
+const PERMANENT_PUSH_ERRORS = new Set([400, 401, 403, 404, 410]);
+const PUBLIC_ASSETS = [
+  "index.html",
+  "app.js",
+  "styles.css",
+  "sw.js",
+  "manifest.webmanifest",
+  "icon-192.png",
+  "icon-512.png",
+  "site-config.json",
+];
+
+function readState() {
+  return existsSync("state.json")
+    ? JSON.parse(readFileSync("state.json", "utf8"))
+    : { snapshot: emptySnapshot(), history: [], pending: [], lastPush: null };
 }
-persist('Record pickup check and pending alerts');
-let subscriptions=[];try{const value=JSON.parse(process.env.PUSH_SUBSCRIPTIONS||'[]');subscriptions=Array.isArray(value)?value:[value];}catch{throw new Error('PUSH_SUBSCRIPTIONS is not valid JSON.');}
-let keys=null;try{keys=JSON.parse(process.env.VAPID_KEYS||'null');}catch{throw new Error('VAPID_KEYS is not valid JSON.');}
-let accepted=0,failed=0;
-if(keys&&keys.publicKey!==config.publicKey)throw new Error('VAPID public key differs from the installed app. Preserve the original keys.');
-if(keys&&subscriptions.length&&!state.lastPush?.configured){
-  const baseline=applyObservations(emptySnapshot(),observations,now).alerts.find(a=>a.type==='stock');
-  if(baseline){state.pending=state.pending.filter(p=>p.alert.type!=='stock');state.pending.push({id:randomUUID(),alert:{...baseline,items:baseline.items.map(i=>({...i,version:state.snapshot.watches[i.key].version}))},at:now,expiresAt:now+POLL_MS,accepted:[]});persist('Queue current availability for newly connected iPhone');}
+
+async function collectObservations() {
+  try {
+    return await fetchPickup();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Source request failed";
+    // A failed request is unknown; it must never look like confirmed sold-out stock.
+    return STORES.flatMap((store) =>
+      VARIANTS.map((variant) => ({
+        key: watchKey(store.id, variant.id),
+        status: "unknown",
+        quote: "Check failed",
+        pickup: "",
+        error: message,
+      })),
+    );
+  }
 }
-for(const sub of subscriptions){
-  const u=new URL(sub.endpoint);if(u.protocol!=='https:'||u.port||u.username||u.password||!(u.hostname.endsWith('.push.apple.com')||u.hostname==='fcm.googleapis.com'||u.hostname==='updates.push.services.mozilla.com'))throw new Error('Unsupported push endpoint.');
-  if(!sub.keys?.p256dh||!sub.keys?.auth)throw new Error('Incomplete push subscription.');
+
+function createPendingAlert(alert, now) {
+  return {
+    id: randomUUID(),
+    alert,
+    at: now,
+    expiresAt: now + (alert.type === "health" ? HEALTH_ALERT_TTL_MS : POLL_MS),
+    accepted: [],
+  };
 }
-for(const pending of state.pending){
-  const alert=currentAlert(pending.alert,state.snapshot);if(!alert||pending.expiresAt<=Date.now())continue;
-  if(!keys||!subscriptions.length)continue;
-  for(const subscription of subscriptions){
-    const id=createHash('sha256').update(subscription.endpoint).digest('hex').slice(0,24);if(pending.accepted.includes(id))continue;
-    for(let attempt=0;attempt<3;attempt++){
-      const ttl=Math.floor((pending.expiresAt-Date.now())/1000);if(ttl<=0)break;
-      try{
-        await webpush.sendNotification(subscription,JSON.stringify({title:alert.title,body:alert.body,url:alert.type==='stock'?alert.url:config.siteUrl,tag:pending.id}),{TTL:ttl,urgency:alert.type==='stock'?'high':'normal',timeout:5000,vapidDetails:{subject:config.siteUrl,publicKey:keys.publicKey,privateKey:keys.privateKey}});
-        pending.accepted.push(id);accepted++;break;
-      }catch(error){const status=Number(error.statusCode??0);if(attempt===2||[400,401,403,404,410].includes(status)){failed++;break;}await new Promise(resolve=>setTimeout(resolve,(attempt+1)*1000));}
+
+function recordCheck(state, observations, now, siteUrl) {
+  const { snapshot, alerts } = applyObservations(state.snapshot, observations, now);
+  state.snapshot = snapshot;
+  state.history = [
+    {
+      at: now,
+      verified: observations.filter((observation) => observation.status !== "unknown").length,
+      error: snapshot.lastError,
+    },
+    ...state.history,
+  ].slice(0, HISTORY_LIMIT);
+
+  for (const alert of alerts) {
+    state.pending.push(createPendingAlert(alert, now));
+  }
+  if (process.env.SEND_TEST === "true") {
+    state.pending.push(
+      createPendingAlert(
+        {
+          type: "test",
+          title: "Duo Watch is connected",
+          body: "Test notification only. Your iPhone can receive pickup alerts from the free cloud tracker.",
+          url: siteUrl,
+          items: [],
+        },
+        now,
+      ),
+    );
+  }
+}
+
+function persistState(state, message) {
+  writeFileSync("state.json", JSON.stringify(state, null, 2) + "\n");
+  if (process.env.GITHUB_ACTIONS !== "true") return;
+
+  execFileSync("git", ["config", "user.name", "github-actions[bot]"]);
+  execFileSync("git", [
+    "config",
+    "user.email",
+    "41898282+github-actions[bot]@users.noreply.github.com",
+  ]);
+  execFileSync("git", ["add", "state.json"]);
+  try {
+    execFileSync("git", ["diff", "--cached", "--quiet"]);
+  } catch {
+    execFileSync("git", ["commit", "-m", message], { stdio: "ignore" });
+    execFileSync("git", ["push", "origin", "HEAD:main"], { stdio: "ignore" });
+  }
+}
+
+function parseSecret(name, fallback) {
+  try {
+    return JSON.parse(process.env[name] || fallback);
+  } catch {
+    throw new Error(`${name} is not valid JSON.`);
+  }
+}
+
+function validateSubscriptions(subscriptions) {
+  for (const subscription of subscriptions) {
+    const endpoint = new URL(subscription.endpoint);
+    const supportedHost =
+      endpoint.hostname.endsWith(".push.apple.com") ||
+      endpoint.hostname === "fcm.googleapis.com" ||
+      endpoint.hostname === "updates.push.services.mozilla.com";
+    if (
+      endpoint.protocol !== "https:" ||
+      endpoint.port ||
+      endpoint.username ||
+      endpoint.password ||
+      !supportedHost
+    ) {
+      throw new Error("Unsupported push endpoint.");
+    }
+    if (!subscription.keys?.p256dh || !subscription.keys?.auth) {
+      throw new Error("Incomplete push subscription.");
     }
   }
 }
-state.pending=state.pending.filter(p=>p.expiresAt>Date.now()&&(!subscriptions.length||p.accepted.length<subscriptions.length)).slice(-24);
-state.lastPush={at:Date.now(),accepted,failed,configured:!!keys&&subscriptions.length>0};
-persist('Record notification delivery results');
-mkdirSync('public',{recursive:true});
-for(const file of['index.html','app.js','styles.css','sw.js','manifest.webmanifest','icon-192.png','icon-512.png','site-config.json'])copyFileSync(file,`public/${file}`);
-writeFileSync('public/status.json',JSON.stringify({snapshot:state.snapshot,history:state.history,lastPush:state.lastPush,generatedAt:Date.now()},null,2));
-console.log(JSON.stringify({verifiedResults:observations.filter(o=>o.status!=='unknown').length,sourceError:snapshot.lastError,pushAccepted:accepted,pushFailed:failed,pushConfigured:state.lastPush.configured}));
-if(snapshot.lastError)process.exitCode=1;
+
+function queueInitialAvailability(state, observations, now) {
+  const baseline = applyObservations(emptySnapshot(), observations, now).alerts.find(
+    (alert) => alert.type === "stock",
+  );
+  if (!baseline) return;
+
+  // A newly connected phone should hear about stock already available at setup time.
+  const alert = {
+    ...baseline,
+    items: baseline.items.map((item) => ({
+      ...item,
+      version: state.snapshot.watches[item.key].version,
+    })),
+  };
+  state.pending = state.pending.filter((pending) => pending.alert.type !== "stock");
+  state.pending.push(createPendingAlert(alert, now));
+  persistState(state, "Queue current availability for newly connected iPhone");
+}
+
+async function deliverNotification(subscription, pending, alert, config, keys) {
+  for (let attempt = 0; attempt < MAX_PUSH_ATTEMPTS; attempt++) {
+    const ttl = Math.floor((pending.expiresAt - Date.now()) / 1000);
+    if (ttl <= 0) return "expired";
+    try {
+      await webpush.sendNotification(
+        subscription,
+        JSON.stringify({
+          title: alert.title,
+          body: alert.body,
+          url: alert.type === "stock" ? alert.url : config.siteUrl,
+          tag: pending.id,
+        }),
+        {
+          TTL: ttl,
+          urgency: alert.type === "stock" ? "high" : "normal",
+          timeout: 5000,
+          vapidDetails: {
+            subject: config.siteUrl,
+            publicKey: keys.publicKey,
+            privateKey: keys.privateKey,
+          },
+        },
+      );
+      return "accepted";
+    } catch (error) {
+      const status = Number(error.statusCode ?? 0);
+      if (attempt === MAX_PUSH_ATTEMPTS - 1 || PERMANENT_PUSH_ERRORS.has(status)) {
+        return "failed";
+      }
+      await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 1000));
+    }
+  }
+}
+
+async function sendPendingAlerts(state, subscriptions, config, keys) {
+  let accepted = 0;
+  let failed = 0;
+  for (const pending of state.pending) {
+    const alert = currentAlert(pending.alert, state.snapshot);
+    if (!alert || pending.expiresAt <= Date.now()) continue;
+    if (!keys || !subscriptions.length) continue;
+
+    for (const subscription of subscriptions) {
+      const subscriptionId = createHash("sha256")
+        .update(subscription.endpoint)
+        .digest("hex")
+        .slice(0, 24);
+      if (pending.accepted.includes(subscriptionId)) continue;
+
+      const result = await deliverNotification(subscription, pending, alert, config, keys);
+      if (result === "accepted") {
+        pending.accepted.push(subscriptionId);
+        accepted++;
+      } else if (result === "failed") {
+        failed++;
+      }
+    }
+  }
+
+  state.pending = state.pending
+    .filter(
+      (pending) =>
+        pending.expiresAt > Date.now() &&
+        (!subscriptions.length || pending.accepted.length < subscriptions.length),
+    )
+    .slice(-PENDING_LIMIT);
+  state.lastPush = {
+    at: Date.now(),
+    accepted,
+    failed,
+    configured: !!keys && subscriptions.length > 0,
+  };
+}
+
+function publishDashboard(state) {
+  mkdirSync("public", { recursive: true });
+  for (const file of PUBLIC_ASSETS) {
+    copyFileSync(file, `public/${file}`);
+  }
+  // Only public stock and delivery totals go into Pages; secrets stay in Actions.
+  writeFileSync(
+    "public/status.json",
+    JSON.stringify(
+      {
+        snapshot: state.snapshot,
+        history: state.history,
+        lastPush: state.lastPush,
+        generatedAt: Date.now(),
+      },
+      null,
+      2,
+    ),
+  );
+}
+
+async function main() {
+  const config = JSON.parse(readFileSync("site-config.json", "utf8"));
+  const state = readState();
+  const now = Date.now();
+  const observations = await collectObservations();
+  recordCheck(state, observations, now, config.siteUrl);
+  // Save pending events before sending so a restarted run can recover them.
+  persistState(state, "Record pickup check and pending alerts");
+
+  const subscriptionValue = parseSecret("PUSH_SUBSCRIPTIONS", "[]");
+  const subscriptions = Array.isArray(subscriptionValue) ? subscriptionValue : [subscriptionValue];
+  const keys = parseSecret("VAPID_KEYS", "null");
+  if (keys && keys.publicKey !== config.publicKey) {
+    throw new Error("VAPID public key differs from the installed app. Preserve the original keys.");
+  }
+  if (keys && subscriptions.length && !state.lastPush?.configured) {
+    queueInitialAvailability(state, observations, now);
+  }
+  validateSubscriptions(subscriptions);
+  await sendPendingAlerts(state, subscriptions, config, keys);
+  persistState(state, "Record notification delivery results");
+  publishDashboard(state);
+
+  console.log(
+    JSON.stringify({
+      verifiedResults: observations.filter((observation) => observation.status !== "unknown")
+        .length,
+      sourceError: state.snapshot.lastError,
+      pushAccepted: state.lastPush.accepted,
+      pushFailed: state.lastPush.failed,
+      pushConfigured: state.lastPush.configured,
+    }),
+  );
+  if (state.snapshot.lastError) process.exitCode = 1;
+}
+
+await main();

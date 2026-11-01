@@ -83,12 +83,28 @@ in repository **Settings → Pages**.
 
 ## Source and local use
 
-`apple.mjs`, `config.mjs`, and `stock.mjs` are generated from the tested TypeScript
-modules in the original workspace. `run.mjs` is the cloud job. The static app is
-`index.html`, `app.js`, `styles.css`, `sw.js`, and its manifest/icons.
+The active source is maintained directly in this repository:
+
+- `config.mjs`: stores, product variants, and the five-minute polling interval.
+- `apple.mjs`: one stock request and validation of Apple's response.
+- `stock.mjs`: confirmed stock state, change detection, and alert grouping.
+- `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
+- `app.js`: dashboard rendering and iPhone notification setup.
+- `sw.js`: background push notifications and notification links.
+- `index.html`, `styles.css`, manifest, and icons: the dashboard presentation.
+- `tests.mjs`: regression tests for parsing, stock transitions, and alerts.
+
+Use descriptive function and variable names. Keep source collection, stock decisions,
+push delivery, and rendering in their respective files. Comments explain constraints
+such as preserving confirmed stock during a failed check or requesting iPhone
+permission directly from a button tap.
+
+Prettier handles consistent formatting. Run `npm run format` after editing;
+`npm run format:check` verifies formatting without changing files and also runs in CI.
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
+npm run format:check
 npm test
 node run.mjs
 python3 -m http.server 4329 --directory public --bind 127.0.0.1

@@ -4,9 +4,14 @@
   "type": "module",
   "scripts": {
     "check": "node run.mjs",
-    "test": "node --test tests.mjs"
+    "test": "node --test tests.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "web-push": "3.6.7"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
   }
 }

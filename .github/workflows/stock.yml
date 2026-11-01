@@ -10,7 +10,7 @@ on:
     branches: [main]
     paths-ignore: [state.json]
   schedule:
-    - cron: '2-57/5 * * * *'
+    - cron: "2-57/5 * * * *"
 permissions:
   contents: write
   pages: write
@@ -31,8 +31,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run format:check
       - run: npm test
       - name: Check Apple and send due notifications
         id: check
