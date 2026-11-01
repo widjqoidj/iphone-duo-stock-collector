@@ -20,6 +20,8 @@ concurrency:
   cancel-in-progress: false
 jobs:
   check-and-publish:
+    # Skip the job entirely if the repository is ever made private.
+    if: github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 3
     environment:
@@ -43,6 +45,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public
+          retention-days: 1
       - name: Publish dashboard
         id: deployment
         uses: actions/deploy-pages@v4

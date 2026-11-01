@@ -60,6 +60,11 @@ paid services. GitHub may restrict or stop service at its limits; no paid fallba
 is configured. Provider terms can change; this is not a promise of perpetual
 third-party availability.
 
+The workflow skips its job if this repository becomes private. Published artifacts
+are small and expire after one day; it does not create long-lived caches or use
+larger runners. The dashboard displays public stock data, while push credentials
+remain in repository secrets.
+
 Public data contains stock observations and redacted delivery totals. Device
 subscription endpoints and the private signing key are stored only in Actions
 secrets. `site-config.json` contains the intentionally public VAPID key.
