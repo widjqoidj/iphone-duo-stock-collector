@@ -1,0 +1,51 @@
+name: Check stock and publish Duo Watch
+on:
+  workflow_dispatch:
+    inputs:
+      send_test:
+        description: Send a test notification to configured iPhones
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths-ignore: [state.json]
+  schedule:
+    - cron: '2-57/5 * * * *'
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: duo-watch
+  cancel-in-progress: false
+jobs:
+  check-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check Apple and send due notifications
+        id: check
+        continue-on-error: true
+        run: node run.mjs
+        env:
+          VAPID_KEYS: ${{ secrets.VAPID_KEYS }}
+          PUSH_SUBSCRIPTIONS: ${{ secrets.PUSH_SUBSCRIPTIONS }}
+          SEND_TEST: ${{ inputs.send_test || 'false' }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - name: Publish dashboard
+        id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Report source failure
+        if: steps.check.outcome == 'failure'
+        run: exit 1

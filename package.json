@@ -1,0 +1,11 @@
+{
+  "name": "duo-watch-free",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node run.mjs"
+  },
+  "dependencies": {
+    "web-push": "3.6.7"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "snapshot": {
+    "watches": {
+      "R096:MK1G4LL/A": {
+        "key": "R096:MK1G4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      },
+      "R096:MK1H4LL/A": {
+        "key": "R096:MK1H4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      },
+      "R413:MK1G4LL/A": {
+        "key": "R413:MK1G4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      },
+      "R413:MK1H4LL/A": {
+        "key": "R413:MK1H4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      },
+      "R147:MK1G4LL/A": {
+        "key": "R147:MK1G4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      },
+      "R147:MK1H4LL/A": {
+        "key": "R147:MK1H4LL/A",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
+        "pickup": "",
+        "confirmed": "unavailable",
+        "confirmedAt": 1793571517310,
+        "attemptedAt": 1793571517310,
+        "version": 1,
+        "failures": 0,
+        "incident": false
+      }
+    },
+    "checkedAt": 1793571517310,
+    "lastError": null
+  },
+  "history": [
+    {
+      "at": 1793571517310,
+      "verified": 6,
+      "error": null
+    }
+  ],
+  "pending": [],
+  "lastPush": {
+    "at": 1793571517702,
+    "accepted": 0,
+    "failed": 0,
+    "configured": false
+  }
+}
