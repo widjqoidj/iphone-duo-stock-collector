@@ -1,0 +1,22 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { parsePickup, fetchPickup } from "./apple.mjs";
+import { applyObservations, currentAlert } from "./stock.mjs";
+import { emptySnapshot, STORES, VARIANTS, watchKey } from "./config.mjs";
+const fixture = () => JSON.parse(readFileSync(new URL("./test-fixture.json", import.meta.url), "utf8"));
+const unavailable = () => parsePickup(fixture());
+const available = () => unavailable().map((o, i) => i === 0 ? { ...o, status: "available", quote: "Available today", pickup: "today" } : o);
+test("real captured response maps exactly six matching store/variant results", () => { const rows = unavailable(); assert.equal(rows.length, 6); assert.ok(rows.every(r => r.status === "unavailable")); assert.equal(rows[0].key, watchKey(STORES[0].id, VARIANTS[0].id)); });
+test("first availability alerts once, including across serialized restart", () => { const first = applyObservations(emptySnapshot(), available(), 100); assert.equal(first.alerts.length, 1); const restart = JSON.parse(JSON.stringify(first.snapshot)); assert.equal(applyObservations(restart, available(), 200).alerts.length, 0); });
+test("a real restock alerts again even with the same pickup wording", () => { let s = applyObservations(emptySnapshot(), available(), 100).snapshot; s = applyObservations(s, unavailable(), 200).snapshot; assert.equal(applyObservations(s, available(), 300).alerts.length, 1); });
+test("unknown preserves confirmed availability and does not cause a false restock", () => { let s = applyObservations(emptySnapshot(), available(), 100).snapshot; s = applyObservations(s, [], 200).snapshot; assert.equal(Object.values(s.watches)[0].confirmed, "available"); assert.equal(Object.values(s.watches)[0].confirmedAt, 100); assert.equal(applyObservations(s, available(), 300).alerts.length, 0); });
+test("missing stores and wrong product titles remain unknown", () => { const d = fixture(); d.body.stores = d.body.stores.filter((s) => s.storeNumber !== STORES[1].id); d.body.stores[0].partsAvailability[VARIANTS[0].id].messageTypes.regular.storePickupProductTitle = "iPhone Duo 256GB Star White"; const rows = parsePickup(d); assert.equal(rows.filter(r => r.status === "unknown").length, 3); });
+test("pickup-date changes alert, cosmetic quote changes do not", () => { const s = applyObservations(emptySnapshot(), available(), 100).snapshot; assert.equal(applyObservations(s, available().map(o => ({ ...o, quote: "Available Today" })), 200).alerts.length, 0); assert.equal(applyObservations(s, available().map((o, i) => i === 0 ? { ...o, pickup: "tomorrow" } : o), 200).alerts.length, 1); });
+test("health incident is raised once after three errors and recovery once", () => { let s = emptySnapshot(); for (let i = 0; i < 3; i++) {
+    const r = applyObservations(s, [], i + 1);
+    assert.equal(r.alerts.length, i === 2 ? 1 : 0);
+    s = r.snapshot;
+} const r = applyObservations(s, [], 4); assert.equal(r.alerts.length, 0); const recovered = applyObservations(r.snapshot, unavailable(), 5); assert.equal(recovered.alerts.length, 1); assert.match(recovered.alerts[0].title, /recovered/); });
+test("superseded pending restock is not sent", () => { const first = applyObservations(emptySnapshot(), available(), 100); const gone = applyObservations(first.snapshot, unavailable(), 200); assert.equal(currentAlert(first.alerts[0], gone.snapshot), null); });
+test("malformed responses and HTML errors never become unavailable", async () => { assert.throws(() => parsePickup({ body: {} })); await assert.rejects(fetchPickup(async () => new Response("<html>error</html>", { headers: { "content-type": "text/html" } })), /not pickup JSON/); await assert.rejects(fetchPickup(async () => new Response("", { status: 429, headers: { "retry-after": "120" } })), /retry-after=120/); });

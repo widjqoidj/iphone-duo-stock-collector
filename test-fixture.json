@@ -1,0 +1,150 @@
+{
+  "body": {
+    "stores": [
+      {
+        "storeNumber": "R096",
+        "storeName": "Shadyside",
+        "partsAvailability": {
+          "MK1G4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1G4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple Shadyside",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple Shadyside<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Star White",
+                "basePartNumber": "MK1G4"
+              }
+            }
+          },
+          "MK1H4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1H4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple Shadyside",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple Shadyside<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Night Sky",
+                "basePartNumber": "MK1H4"
+              }
+            }
+          }
+        }
+      },
+      {
+        "storeNumber": "R413",
+        "storeName": "Ross Park",
+        "partsAvailability": {
+          "MK1G4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1G4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple Ross Park",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple Ross Park<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Star White",
+                "basePartNumber": "MK1G4"
+              }
+            }
+          },
+          "MK1H4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1H4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple Ross Park",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple Ross Park<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Night Sky",
+                "basePartNumber": "MK1H4"
+              }
+            }
+          }
+        }
+      },
+      {
+        "storeNumber": "R147",
+        "storeName": "South Hills Village",
+        "partsAvailability": {
+          "MK1G4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1G4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple South Hills Village",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple South Hills Village<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Star White",
+                "basePartNumber": "MK1G4"
+              }
+            }
+          },
+          "MK1H4LL/A": {
+            "storePickEligible": true,
+            "pickupSearchQuote": "Currently unavailable",
+            "partNumber": "MK1H4LL/A",
+            "purchaseOption": "",
+            "ctoOptions": "",
+            "pickupDisplay": "unavailable",
+            "pickupType": "In-Store Pickup",
+            "messageTypes": {
+              "regular": {
+                "storeSearchEnabled": true,
+                "storePickupLabel": "Pickup:",
+                "storeSelectionEnabled": false,
+                "storePickupQuote": "Currently unavailable at Apple South Hills Village",
+                "storePickupQuote2_0": "Currently unavailable at <button type=\"button\" class=\"rf-pickup-quote-overlay-trigger as-retailavailabilitytrigger-infobutton retail-availability-search-trigger as-buttonlink as-buttonlink-inline icon icon-after icon-pluscircle\" data-ase-overlay=\"buac-overlay\" data-ase-click=\"show\">Apple South Hills Village<span class=\"visuallyhidden\">\u00a0(Check Availability)</span></button>",
+                "storePickupLinkText": "Check availability",
+                "storePickupProductTitle": "iPhone Duo 512GB Night Sky",
+                "basePartNumber": "MK1H4"
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

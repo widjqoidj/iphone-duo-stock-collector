@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm test
       - name: Check Apple and send due notifications
         id: check
         continue-on-error: true

@@ -89,6 +89,7 @@ modules in the original workspace. `run.mjs` is the cloud job. The static app is
 
 ```sh
 npm ci --ignore-scripts --no-audit --no-fund
+npm test
 node run.mjs
 python3 -m http.server 4329 --directory public --bind 127.0.0.1
 ```
@@ -96,6 +97,9 @@ python3 -m http.server 4329 --directory public --bind 127.0.0.1
 Local runs save state and build `public/`; they do not push repository commits.
 Push delivery requires `VAPID_KEYS` and `PUSH_SUBSCRIPTIONS` in the environment.
 Do not put their values in source. Localhost on your phone is not this computer.
+
+`test-fixture.json` is a reduced real Apple response captured November 1, 2026;
+all six results were unavailable. Available states in the tests are synthetic.
 
 ## References
 

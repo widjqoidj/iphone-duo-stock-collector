@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check": "node run.mjs"
+    "check": "node run.mjs",
+    "test": "node --test tests.mjs"
   },
   "dependencies": {
     "web-push": "3.6.7"
