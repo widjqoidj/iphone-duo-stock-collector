@@ -129,25 +129,11 @@
       "error": null
     }
   ],
-  "pending": [
-    {
-      "id": "555241c1-67e4-4086-ae8d-575886f9b2c5",
-      "alert": {
-        "type": "test",
-        "title": "Duo Watch is connected",
-        "body": "Test notification only. Your iPhone can receive pickup alerts from the free cloud tracker.",
-        "url": "https://widjqoidj.github.io/iphone-duo-stock-collector/",
-        "items": []
-      },
-      "at": 1793573264378,
-      "expiresAt": 1793573564378,
-      "accepted": []
-    }
-  ],
+  "pending": [],
   "lastPush": {
-    "at": 1793572656587,
-    "accepted": 0,
+    "at": 1793573266266,
+    "accepted": 1,
     "failed": 0,
-    "configured": false
+    "configured": true
   }
 }
