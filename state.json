@@ -7,8 +7,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -19,8 +19,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -31,8 +31,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -43,8 +43,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -55,8 +55,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -67,17 +67,22 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793572654841,
-        "attemptedAt": 1793572654841,
+        "confirmedAt": 1793573264378,
+        "attemptedAt": 1793573264378,
         "version": 1,
         "failures": 0,
         "incident": false
       }
     },
-    "checkedAt": 1793572654841,
+    "checkedAt": 1793573264378,
     "lastError": null
   },
   "history": [
+    {
+      "at": 1793573264378,
+      "verified": 6,
+      "error": null
+    },
     {
       "at": 1793572654841,
       "verified": 6,
@@ -124,7 +129,21 @@
       "error": null
     }
   ],
-  "pending": [],
+  "pending": [
+    {
+      "id": "555241c1-67e4-4086-ae8d-575886f9b2c5",
+      "alert": {
+        "type": "test",
+        "title": "Duo Watch is connected",
+        "body": "Test notification only. Your iPhone can receive pickup alerts from the free cloud tracker.",
+        "url": "https://widjqoidj.github.io/iphone-duo-stock-collector/",
+        "items": []
+      },
+      "at": 1793573264378,
+      "expiresAt": 1793573564378,
+      "accepted": []
+    }
+  ],
   "lastPush": {
     "at": 1793572656587,
     "accepted": 0,
