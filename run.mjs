@@ -24,6 +24,10 @@ let subscriptions=[];try{const value=JSON.parse(process.env.PUSH_SUBSCRIPTIONS||
 let keys=null;try{keys=JSON.parse(process.env.VAPID_KEYS||'null');}catch{throw new Error('VAPID_KEYS is not valid JSON.');}
 let accepted=0,failed=0;
 if(keys&&keys.publicKey!==config.publicKey)throw new Error('VAPID public key differs from the installed app. Preserve the original keys.');
+if(keys&&subscriptions.length&&!state.lastPush?.configured){
+  const baseline=applyObservations(emptySnapshot(),observations,now).alerts.find(a=>a.type==='stock');
+  if(baseline){state.pending=state.pending.filter(p=>p.alert.type!=='stock');state.pending.push({id:randomUUID(),alert:{...baseline,items:baseline.items.map(i=>({...i,version:state.snapshot.watches[i.key].version}))},at:now,expiresAt:now+POLL_MS,accepted:[]});persist('Queue current availability for newly connected iPhone');}
+}
 for(const sub of subscriptions){
   const u=new URL(sub.endpoint);if(u.protocol!=='https:'||u.port||u.username||u.password||!(u.hostname.endsWith('.push.apple.com')||u.hostname==='fcm.googleapis.com'||u.hostname==='updates.push.services.mozilla.com'))throw new Error('Unsupported push endpoint.');
   if(!sub.keys?.p256dh||!sub.keys?.auth)throw new Error('Incomplete push subscription.');
