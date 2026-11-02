@@ -7,8 +7,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -19,8 +19,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -31,8 +31,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -43,8 +43,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -55,8 +55,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -67,17 +67,23 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793588124234,
-        "attemptedAt": 1793588124234,
+        "confirmedAt": 1793588477967,
+        "attemptedAt": 1793588477967,
         "version": 1,
         "failures": 0,
         "incident": false
       }
     },
-    "checkedAt": 1793588124234,
+    "checkedAt": 1793588477967,
     "lastError": null
   },
   "history": [
+    {
+      "at": 1793588477967,
+      "verified": 6,
+      "error": null,
+      "trigger": "external-schedule"
+    },
     {
       "at": 1793588124234,
       "verified": 6,
@@ -184,11 +190,6 @@
       "at": 1793572238981,
       "verified": 6,
       "error": null
-    },
-    {
-      "at": 1793572159107,
-      "verified": 6,
-      "error": null
     }
   ],
   "pending": [],
@@ -198,6 +199,6 @@
     "failed": 0,
     "configured": true
   },
-  "lastScheduledAt": 1793588124234,
+  "lastScheduledAt": 1793588477967,
   "lastTimerSource": "cron-job.org"
 }
