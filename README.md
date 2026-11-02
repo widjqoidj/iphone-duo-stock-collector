@@ -33,7 +33,8 @@ use a JSON array containing both subscription objects in `PUSH_SUBSCRIPTIONS`.
 
 ## Notifications and checks
 
-- The target interval is **five minutes**, offset from the top of the hour.
+- The target interval is **five minutes**. The dedicated `timer.yml` workflow
+  calls the reusable `stock.yml` job; manual checks use the same job.
   GitHub schedules are best effort and can be delayed or dropped under load.
 - The dashboard marks results stale after 15 minutes without confirmation.
   It refreshes published data when reopened, after connectivity returns, and once
@@ -95,6 +96,8 @@ The active source is maintained directly in this repository:
 - `apple.mjs`: one stock request and validation of Apple's response.
 - `stock.mjs`: confirmed stock state, change detection, and alert grouping.
 - `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
+- `.github/workflows/timer.yml`: five-minute automatic trigger.
+- `.github/workflows/stock.yml`: shared stock-check and publishing job, also runnable manually.
 - `app.js`: dashboard rendering and iPhone notification setup.
 - `health.mjs`: shared freshness rules and app health messages.
 - `sw.js`: background push notifications and notification links.

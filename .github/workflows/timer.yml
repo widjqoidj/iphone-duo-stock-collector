@@ -1,0 +1,14 @@
+name: Automatic stock checks
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+jobs:
+  check-stock:
+    if: github.event.repository.private == false
+    uses: ./.github/workflows/stock.yml
+    secrets: inherit

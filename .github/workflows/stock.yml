@@ -9,8 +9,12 @@ on:
   push:
     branches: [main]
     paths-ignore: [state.json]
-  schedule:
-    - cron: "3,8,13,18,23,28,33,38,43,48,53,58 * * * *"
+  workflow_call:
+    inputs:
+      send_test:
+        description: Send a test notification to configured iPhones
+        type: boolean
+        default: false
 permissions:
   contents: write
   pages: write
