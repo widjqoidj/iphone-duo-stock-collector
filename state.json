@@ -7,8 +7,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -19,8 +19,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -31,8 +31,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -43,8 +43,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -55,8 +55,8 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
@@ -67,17 +67,22 @@
         "quote": "Currently unavailable",
         "pickup": "",
         "confirmed": "unavailable",
-        "confirmedAt": 1793574028654,
-        "attemptedAt": 1793574028654,
+        "confirmedAt": 1793577863185,
+        "attemptedAt": 1793577863185,
         "version": 1,
         "failures": 0,
         "incident": false
       }
     },
-    "checkedAt": 1793574028654,
+    "checkedAt": 1793577863185,
     "lastError": null
   },
   "history": [
+    {
+      "at": 1793577863185,
+      "verified": 6,
+      "error": null
+    },
     {
       "at": 1793574028654,
       "verified": 6,
