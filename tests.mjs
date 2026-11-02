@@ -5,6 +5,8 @@ import { parsePickup, fetchPickup } from "./apple.mjs";
 import { applyObservations, currentAlert } from "./stock.mjs";
 import { recordDailyTrend, dailySeries, easternDay } from "./trend.mjs";
 import { trendFromSnapshots } from "./scripts/backfill-trend.mjs";
+import { historicalRecords, reportedSeries } from "./history.mjs";
+import { predictRestock, restockEpisodes } from "./prediction.mjs";
 import { describeTrigger } from "./automation.mjs";
 import { describeHealth, displayStatus, STALE_AFTER_MS } from "./health.mjs";
 import { emptySnapshot, STORES, VARIANTS, watchKey } from "./config.mjs";
@@ -286,4 +288,126 @@ test("daily totals retain a bounded 365-day history", () => {
   }
   assert.equal(Object.keys(trend.days).length, 365);
   assert.equal(trend.days["2026-11-01"], undefined);
+});
+
+const importedHistory = JSON.parse(
+  readFileSync(new URL("./data/external-history.json", import.meta.url), "utf8"),
+);
+const forecastNow = Date.parse("2026-11-02T22:22:00Z");
+
+test("reviewed history preserves 13 restocks and six sightings without manufacturing zero days", () => {
+  const records = historicalRecords(importedHistory, forecastNow);
+  assert.equal(records.length, 19);
+  assert.equal(records.filter((r) => r.kind === "restock").length, 13);
+  const series = reportedSeries(importedHistory, forecastNow);
+  assert.equal(series.find((day) => day.date === "2026-10-27").restocks, 2);
+  const friday = series.find((day) => day.date === "2026-10-30");
+  assert.equal(friday.restocks, 11);
+  assert.deepEqual(friday.byStore, { R096: 1, R413: 8, R147: 2 });
+  assert.equal(series.find((day) => day.date === "2026-10-31").restocks, null);
+  assert.ok(records.every((r) => r.carrier === "unspecified"));
+});
+
+test("external history rejects incompatible, future, ambiguous and duplicate records", () => {
+  const record = importedHistory.records[0];
+  const history = {
+    ...importedHistory,
+    records: [
+      record,
+      record,
+      { ...record, storageGB: 256 },
+      { ...record, model: "iPhone 18 Pro" },
+      { ...record, storeId: "other" },
+      { ...record, variantId: "other" },
+      { ...record, at: "2026-12-01T10:00:00-05:00" },
+      { ...record, at: "2026-10-30T10:00:00" },
+      { ...record, sourceId: "unknown" },
+      { ...record, url: "https://unrelated.example/event" },
+      { ...record, kind: "example" },
+    ],
+  };
+  assert.equal(historicalRecords(history, forecastNow).length, 1);
+  assert.equal(
+    historicalRecords({ ...history, sources: { "instock-radar": { url: "invalid" } } }, forecastNow)
+      .length,
+    0,
+  );
+});
+
+test("broader external reports supply descriptive hours but cannot unlock a date prediction", () => {
+  const forecast = predictRestock(null, importedHistory, forecastNow);
+  assert.equal(forecast.status, "learning");
+  assert.equal(forecast.range, null);
+  assert.equal(forecast.episodes, 0);
+  assert.deepEqual(
+    forecast.clues.map((c) => [c.startHour, c.endHour, c.days]),
+    [
+      [9, 11, 2],
+      [8, 12, 1],
+      [9, 10, 2],
+    ],
+  );
+  assert.ok(
+    predictRestock(null, importedHistory, Date.parse("2027-01-01T12:00:00Z")).clues.every(
+      (c) => c.reports === 0,
+    ),
+  );
+});
+
+test("recorded event ledger survives restart, deduplicates checks, and backfills real transitions", () => {
+  const soldOut = applyObservations(emptySnapshot(), unavailable(), trendStart).snapshot;
+  const trend = recordDailyTrend(null, soldOut, available(), trendStart + 300000);
+  assert.deepEqual(trend.events, [
+    { at: trendStart + 300000, storeId: STORES[0].id, variantId: VARIANTS[0].id },
+  ]);
+  const stocked = applyObservations(soldOut, available(), trendStart + 300000).snapshot;
+  const restarted = recordDailyTrend(
+    JSON.parse(JSON.stringify(trend)),
+    stocked,
+    available(),
+    trendStart + 300000,
+  );
+  assert.equal(restarted.events.length, 1);
+  assert.equal(trendFromSnapshots([soldOut, stocked, stocked]).events.length, 1);
+});
+
+test("forecast merges simultaneous colors and short stock flaps into independent store episodes", () => {
+  const events = [0, 1, 15, 30, 31].map((minutes) => ({
+    storeId: "R096",
+    at: forecastNow + minutes * 60000,
+  }));
+  events.push({ storeId: "R413", at: forecastNow });
+  assert.equal(restockEpisodes(events).length, 3);
+});
+
+function predictionFixture() {
+  const events = [];
+  const days = {};
+  // Five restock days over 16 days, with two independent store episodes each.
+  for (let index = 0; index < 20; index++) {
+    const at = Date.parse("2026-10-14T14:00:00Z") + index * 86400000;
+    const date = easternDay(at);
+    days[date] = { completeChecks: 280 };
+    if ([0, 4, 8, 12, 16].includes(index)) {
+      for (const store of STORES.slice(0, 2))
+        events.push({ at, storeId: store.id, variantId: VARIANTS[0].id });
+    }
+  }
+  return { events, days };
+}
+
+test("date estimate uses only adequately observed history and never rolls an overdue date forward", () => {
+  const trend = predictionFixture();
+  const forecast = predictRestock(trend, importedHistory, forecastNow);
+  assert.equal(forecast.status, "estimate");
+  assert.deepEqual(forecast.range, { start: "2026-11-03", end: "2026-11-03" });
+  const late = predictRestock(trend, importedHistory, Date.parse("2026-11-04T17:00:00Z"));
+  assert.equal(late.status, "learning"); // Nov 3 has no recorded coverage.
+  trend.days["2026-11-03"] = { completeChecks: 280 };
+  assert.equal(
+    predictRestock(trend, importedHistory, Date.parse("2026-11-04T17:00:00Z")).status,
+    "overdue",
+  );
+  trend.days["2026-10-20"].completeChecks = 0;
+  assert.equal(predictRestock(trend, importedHistory, forecastNow).range, null);
 });

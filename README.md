@@ -80,6 +80,66 @@ saves of a check and preserves the current stock and notification state. Commit
 the resulting state with the feature deployment. Normal cloud runs only append
 to the stored totals; they do not require full Git history.
 
+## Historical reports and restock outlook
+
+Under **Trends → History source**, choose **Other trackers · partial history**
+to see reviewed 512GB restock reports from before this tracker began. The two
+histories stay separate: imported reports do not verify the unlocked option,
+replace live Apple results, send notifications, or count as our own observations.
+Missing external dates mean no imported records, never a confirmed zero.
+
+The November 2 snapshot contains 13 reported transitions from InStock Radar
+(October 27 and 30) and six last-in-stock values from Wenstock. Each record has
+its store, color, original timestamp with an explicit UTC offset, source URL,
+event type, and carrier scope. **Sources and records** shows the attribution and
+timestamp on the dashboard. Last-in-stock sightings are not transitions and
+are excluded from histogram counts. The sources disagree on some last dates
+and times; their records are retained separately, not combined as confirmation.
+
+Source pages:
+
+- [InStock Radar Shadyside](https://instockradar.com/us/store/shadyside/iphone-duo)
+- [InStock Radar Ross Park](https://instockradar.com/us/store/rosspark/restocks)
+- [InStock Radar South Hills Village](https://instockradar.com/us/store/southhillsvillage/iphone-duo)
+- [Wenstock Shadyside](https://wenstock.app/store/shadyside)
+- [Wenstock Ross Park](https://wenstock.app/store/ross-park)
+- [Wenstock South Hills Village](https://wenstock.app/store/south-hills-village)
+
+`data/external-history.json` is a reviewed, attributed historical snapshot, not
+an automated feed. InStock Radar's history pages permit attributed quotation;
+its [terms](https://instockradar.com/legal/terms) prohibit scraping. There is no
+third-party scraper, account, subscription, or paid API. To extend the snapshot,
+review permitted public factual records or an authorized export, add their
+provenance and explicit offset, and run the checks before publishing. Do not
+import marketing examples, national aggregates, other capacities, or generic
+all-iPhone store counts. `historicalRecords()` rejects incompatible records,
+future/ambiguous timestamps, unrecognized sources, and exact duplicate rows.
+
+**Restock outlook** shows descriptive, whole-hour spans from the imported reports.
+These are clues from a small, incomplete sample, not a promise of another drop
+in those hours. The experimental date estimate trains only on this tracker's
+own confirmed unlocked transitions from the most recent 28 Eastern calendar days.
+It requires all of the following:
+
+- At least 14 completed days with 225 fully verified checks each, and no uncovered
+  completed day between the first restock day used and today.
+- At least five distinct restock days spanning 14 days and eight store episodes.
+  Colors returning together and repeated changes within 30 minutes of a store's
+  episode start count as one episode, so stock flaps cannot inflate the sample.
+
+The estimate covers any of the three stores. It adds the 25th–75th percentile
+of gaps between observed restock days to the latest restock date. This is an
+experimental historical range, **not a calibrated confidence interval or a
+validated predictive model**. If that range has already passed, it is withheld
+rather than moved forward. A missing-coverage or insufficient-data result also
+withholds the estimate. Current history is too small for a date prediction.
+
+Own event timestamps are persisted alongside daily totals for up to 365 days;
+the repository backfill also reconstructs this ledger. The outlook recomputes
+when published results load, and cloud checks persist new events. Five-minute
+checks can miss brief availability. Everything runs locally in the existing
+workflow/browser; there are no additional requests to Apple or paid services.
+
 ## Free-only configuration
 
 Keep the repository **public**, `runs-on: ubuntu-latest`, the default `github.io`
@@ -122,6 +182,8 @@ The active source is maintained directly in this repository:
 - `stock.mjs`: confirmed stock state, change detection, and alert grouping.
 - `trend.mjs` and `trend-chart.js`: daily restock aggregation and interactive histogram.
 - `scripts/backfill-trend.mjs`: rebuilds daily totals from saved repository history.
+- `history.mjs` and `data/external-history.json`: validation and provenance for external history.
+- `prediction.mjs` and `outlook.js`: guarded date estimate, historical hours, and source records.
 - `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
 - `.github/workflows/timer.yml`: legacy native timer; disable when using cron-job.org.
 - `automation.mjs`: distinguishes external timer, native timer, and manual requests.

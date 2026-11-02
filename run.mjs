@@ -20,6 +20,9 @@ const PUBLIC_ASSETS = [
   "trend.mjs",
   "config.mjs",
   "trend-chart.js",
+  "history.mjs",
+  "prediction.mjs",
+  "outlook.js",
   "styles.css",
   "sw.js",
   "manifest.webmanifest",
@@ -257,6 +260,7 @@ function publishDashboard(state) {
         snapshot: state.snapshot,
         history: state.history,
         trend: state.trend,
+        externalHistory: JSON.parse(readFileSync("data/external-history.json", "utf8")),
         lastPush: state.lastPush,
         generatedAt: Date.now(),
         monitor: {

@@ -14,8 +14,8 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icon-192.png" />
     <link rel="icon" href="./icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=5" />
-    <script src="./app.js?v=5" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=6" />
+    <script src="./app.js?v=6" type="module"></script>
   </head>
   <body>
     <header class="topbar">
@@ -93,15 +93,27 @@
             <div class="card trend-card">
               <div class="trend-summary">
                 <div>
-                  <strong id="trend-total">—</strong><span>observed restocks · 30 days</span>
+                  <strong id="trend-total">—</strong
+                  ><span id="trend-count-label">observed restocks · 30 days</span>
                 </div>
                 <span class="trend-period" id="trend-period">Loading history…</span>
+              </div>
+              <div class="trend-day-picker trend-source-picker">
+                <label for="trend-source">History source</label>
+                <select id="trend-source">
+                  <option value="local">This tracker · unlocked</option>
+                  <option value="external">Other trackers · partial history</option>
+                </select>
               </div>
               <p class="trend-note" id="trend-note"></p>
               <div id="trend-chart" class="trend-chart"></div>
               <div class="trend-legend">
-                <span><i class="legend-observed"></i>Observed</span
-                ><span><i class="legend-missing"></i>No verified data</span
+                <span
+                  ><i class="legend-observed"></i
+                  ><span id="trend-legend-observed">Observed</span></span
+                ><span
+                  ><i class="legend-missing"></i
+                  ><span id="trend-legend-missing">No verified data</span></span
                 ><span>Today is in progress</span>
               </div>
               <div class="trend-day-picker">
@@ -113,6 +125,37 @@
                 One restock is one store/color changing from unavailable to available. Changes
                 between checks may be missed. Daily bars roll over at midnight Eastern Time.
               </p>
+            </div>
+          </section>
+          <section id="restock-outlook" class="trend-section" aria-labelledby="outlook-heading">
+            <div class="section-heading">
+              <h2 id="outlook-heading">Restock outlook</h2>
+              <span>Experimental</span>
+            </div>
+            <div class="card trend-card">
+              <p class="outlook-label">Next restock date</p>
+              <h3 id="prediction-title">Loading history…</h3>
+              <p id="prediction-detail" class="outlook-detail"></p>
+              <p id="prediction-progress" class="card-footnote"></p>
+              <h4 class="outlook-subheading">Historical hours to watch</h4>
+              <div id="prediction-clues" class="prediction-clues"></div>
+              <p class="card-footnote">
+                Hours span the imported 512GB reports, rounded out to whole hours. The sample is
+                small and incomplete; carrier option is unspecified. A restock may happen at another
+                time or may not happen that day. Only our own unlocked observations train the date
+                estimate. Predictions update with each cloud check and never send stock alerts.
+              </p>
+              <details class="external-details">
+                <summary>Sources and records</summary>
+                <p id="external-summary" class="outlook-detail"></p>
+                <p class="card-footnote">
+                  Reviewed snapshot, not an automatic third-party feed. InStock Radar permits
+                  attributed quotation and prohibits scraping. Wenstock last-in-stock sightings are
+                  shown separately and excluded from restock counts. Sources differ on some last
+                  dates and times; neither confirms the unlocked option.
+                </p>
+                <ul id="external-records" class="external-records"></ul>
+              </details>
             </div>
           </section>
           <section class="history-section" aria-labelledby="history-heading">

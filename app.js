@@ -1,4 +1,5 @@
-import { renderTrend } from "./trend-chart.js?v=5";
+import { renderTrend } from "./trend-chart.js?v=6";
+import { renderOutlook } from "./outlook.js?v=6";
 import { describeHealth, displayStatus } from "./health.mjs?v=4";
 
 const stores = [
@@ -179,7 +180,8 @@ async function loadDashboard() {
   if (lastDashboardData) {
     renderStock(lastDashboardData.snapshot);
     renderHealth(lastDashboardData);
-    renderTrend(lastDashboardData.trend);
+    renderTrend(lastDashboardData.trend, lastDashboardData.externalHistory);
+    renderOutlook(lastDashboardData.trend, lastDashboardData.externalHistory);
   }
   try {
     const response = await fetch("./status.json?t=" + Date.now(), {
@@ -195,7 +197,8 @@ async function loadDashboard() {
     lastDashboardData = data;
     renderStock(data.snapshot);
     renderHistory(data.history);
-    renderTrend(data.trend);
+    renderTrend(data.trend, data.externalHistory);
+    renderOutlook(data.trend, data.externalHistory);
     renderHealth(data);
     element("fetch-error").hidden = true;
   } catch (error) {

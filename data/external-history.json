@@ -1,0 +1,233 @@
+{
+  "reviewedAt": "2026-11-02T22:22:00Z",
+  "coverage": "Partial public history, not a complete archive. Carrier option is not specified by either source.",
+  "sources": {
+    "instock-radar": {
+      "name": "InStock Radar",
+      "url": "https://instockradar.com",
+      "method": "Reviewed public restock rows; pages allow quotation with attribution. No automated scraping.",
+      "termsUrl": "https://instockradar.com/legal/terms"
+    },
+    "wenstock": {
+      "name": "Wenstock",
+      "url": "https://wenstock.app",
+      "method": "Reviewed public last-in-stock values. These are sightings, not additional restock transitions."
+    }
+  },
+  "notes": [
+    "Sources differ: Shadyside Night Sky has different last dates; South Hills Star White has different last times. Records are preserved separately rather than treated as confirmation.",
+    "Wenstock last-in-stock values are excluded from histogram counts and prediction training.",
+    "Only our own confirmed unlocked observations train the date estimate. Imported reports never change live stock or trigger push."
+  ],
+  "records": [
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/shadyside/iphone-duo",
+      "storeId": "R096",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T10:01:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/shadyside/iphone-duo",
+      "storeId": "R096",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-27T09:58:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T11:32:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:55:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:53:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:39:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:35:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:35:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:25:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/rosspark/restocks",
+      "storeId": "R413",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T08:25:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/southhillsvillage/iphone-duo",
+      "storeId": "R147",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T09:32:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/southhillsvillage/iphone-duo",
+      "storeId": "R147",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-30T09:32:00-04:00"
+    },
+    {
+      "sourceId": "instock-radar",
+      "url": "https://instockradar.com/us/store/southhillsvillage/iphone-duo",
+      "storeId": "R147",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "restock",
+      "at": "2026-10-27T09:22:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/shadyside",
+      "storeId": "R096",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-30T10:01:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/shadyside",
+      "storeId": "R096",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-31T09:57:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/ross-park",
+      "storeId": "R413",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-30T08:55:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/ross-park",
+      "storeId": "R413",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-30T11:32:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/south-hills-village",
+      "storeId": "R147",
+      "variantId": "MK1G4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-30T12:15:00-04:00"
+    },
+    {
+      "sourceId": "wenstock",
+      "url": "https://wenstock.app/store/south-hills-village",
+      "storeId": "R147",
+      "variantId": "MK1H4LL/A",
+      "model": "iPhone Duo",
+      "storageGB": 512,
+      "carrier": "unspecified",
+      "kind": "last-seen",
+      "at": "2026-10-30T09:35:00-04:00"
+    }
+  ]
+}

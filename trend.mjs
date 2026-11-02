@@ -17,7 +17,7 @@ export function easternDay(timestamp) {
   return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
-function shiftDay(day, offset) {
+export function shiftDay(day, offset) {
   // Shift calendar dates in UTC so a daylight-saving transition cannot skip a bin.
   return new Date(Date.parse(`${day}T12:00:00Z`) + offset * DAY_MS).toISOString().slice(0, 10);
 }
@@ -38,6 +38,7 @@ export function recordDailyTrend(previous, previousSnapshot, observations, now) 
     byStore: { ...Object.fromEntries(STORES.map((store) => [store.id, 0])), ...existing?.byStore },
   };
   let verifiedThisCheck = 0;
+  const events = [...(previous?.events ?? [])];
   for (const store of STORES) {
     for (const variant of VARIANTS) {
       const key = watchKey(store.id, variant.id);
@@ -51,6 +52,7 @@ export function recordDailyTrend(previous, previousSnapshot, observations, now) 
       ) {
         day.restocks++;
         day.byStore[store.id]++;
+        events.push({ at: now, storeId: store.id, variantId: variant.id });
       }
     }
   }
@@ -65,6 +67,7 @@ export function recordDailyTrend(previous, previousSnapshot, observations, now) 
     startedAt: previous?.startedAt ?? now,
     lastCheckAt: now,
     days,
+    events: events.filter((event) => easternDay(event.at) >= cutoff),
   };
 }
 
