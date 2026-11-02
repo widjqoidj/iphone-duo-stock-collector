@@ -83,7 +83,9 @@ to save stock state and deploy Pages; no personal access token is required.
 
 ## Stop the tracker
 
-Open **Actions → Check stock and publish Duo Watch → … → Disable workflow**.
+Open **Actions → Automatic stock checks → … → Disable workflow**.
+This stops the timer; manual stock checks remain available in the separate
+**Check stock and publish Duo Watch** workflow.
 To stop alerts on one iPhone, tap **Turn off on this device** and remove or update
 the `PUSH_SUBSCRIPTIONS` secret. To remove the dashboard, unpublish GitHub Pages
 in repository **Settings → Pages**.
