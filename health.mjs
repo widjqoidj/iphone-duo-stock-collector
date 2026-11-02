@@ -43,7 +43,7 @@ export function describeHealth(data, now = Date.now()) {
       state: "schedule-pending",
       title: lastScheduledAt ? "Automatic checks delayed" : "Automatic checks not confirmed",
       detail: lastScheduledAt
-        ? "Stock data is current, but the last timer-triggered check is over 15 minutes old. GitHub may delay scheduled runs."
+        ? "Stock data is current, but the last timer-triggered check is over 15 minutes old. Check the timer service if updates stop."
         : "Stock data is current. No timer-triggered check has been recorded yet; use Run stock check if updates stop.",
     };
   }
@@ -59,6 +59,6 @@ export function describeHealth(data, now = Date.now()) {
     state: "healthy",
     title: "Cloud checks are up to date",
     detail:
-      "The latest stock check and automatic timer are current. Checks target every five minutes; GitHub can delay runs.",
+      "The latest stock check and automatic timer request are current. Checks target every five minutes; GitHub can delay job execution.",
   };
 }

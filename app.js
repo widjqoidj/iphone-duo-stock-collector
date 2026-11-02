@@ -1,4 +1,4 @@
-import { describeHealth, displayStatus } from "./health.mjs?v=3";
+import { describeHealth, displayStatus } from "./health.mjs?v=4";
 
 const stores = [
   { id: "R096", name: "Shadyside", address: "5436 Walnut Street", slug: "shadyside" },
@@ -136,7 +136,7 @@ function renderHistory(history) {
           <span class="history-icon ${check.error ? "" : "ok"}">${check.error ? "!" : "✓"}</span>
           <div>
             <b>${check.error ? "Check needs attention" : "All three stores checked"}</b>
-            <small>${check.trigger === "schedule" ? "Automatic check" : "Cloud check"} · ${check.verified} of 6 results verified</small>
+            <small>${["schedule", "external-schedule"].includes(check.trigger) ? "Automatic check" : "Cloud check"} · ${check.verified} of 6 results verified</small>
           </div>
           <time>${formatTime(check.at)}</time>
         </div>`,
@@ -157,6 +157,7 @@ function renderHealth(data) {
   element("monitor-schedule").textContent = data.monitor?.lastScheduledAt
     ? formatTime(data.monitor.lastScheduledAt)
     : "No run recorded";
+  element("monitor-provider").textContent = data.monitor?.timerSource ?? "Not verified";
   element("monitor-push").textContent = data.lastPush?.configured
     ? data.lastPush.failed > 0
       ? "Delivery error"

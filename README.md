@@ -6,7 +6,8 @@ Star White and Night Sky, at **Shadyside, Ross Park, and South Hills Village**.
 The dashboard uses free GitHub Pages. A custom GitHub Actions workflow uses only
 the standard `ubuntu-latest` runner in this public repository. It checks Apple's
 pickup endpoint, saves the results, publishes the dashboard, and sends Web Push
-notifications directly. There is no paid database, external notification service,
+notifications directly. The external timer integration uses the free cron-job.org
+HTTP scheduler; see [setup and verification](EXTERNAL_TIMER.md). There is no paid database, external notification service,
 custom domain, OpenAI API call, or paid runner.
 
 ## Install on your iPhone
@@ -23,7 +24,7 @@ custom domain, OpenAI API call, or paid runner.
    Notification Center after the run. Seeing the notification completes setup;
    a successful workflow alone does not prove phone delivery.
 
-Once connected, normal scheduled runs send stock changes automatically. The app
+Once both the timer and device are connected, scheduled runs send stock changes automatically. The app
 can stay closed. A notification opens the matching Apple product page, or the
 dashboard for grouped matches. Availability is not a reservation or a quantity.
 Confirm your selected store and configuration on Apple before traveling.
@@ -33,9 +34,11 @@ use a JSON array containing both subscription objects in `PUSH_SUBSCRIPTIONS`.
 
 ## Notifications and checks
 
-- The target interval is **five minutes**. The dedicated `timer.yml` workflow
-  calls the reusable `stock.yml` job; manual checks use the same job.
-  GitHub schedules are best effort and can be delayed or dropped under load.
+- The target interval is **five minutes**. cron-job.org can trigger the
+  `stock.yml` workflow directly, bypassing GitHub's unreliable native timer.
+  GitHub can still delay runner execution. Complete the
+  [external timer setup](EXTERNAL_TIMER.md) and verify two scheduled runs.
+  The old native timer must remain disabled while using the external scheduler.
 - The dashboard marks results stale after 15 minutes without confirmation.
   It refreshes published data when reopened, after connectivity returns, and once
   per minute while visible. It does not send extra Apple requests from the phone.
@@ -83,9 +86,9 @@ to save stock state and deploy Pages; no personal access token is required.
 
 ## Stop the tracker
 
-Open **Actions → Automatic stock checks → … → Disable workflow**.
-This stops the timer; manual stock checks remain available in the separate
-**Check stock and publish Duo Watch** workflow.
+Disable **Duo Watch stock check** in cron-job.org. Keep the old GitHub native
+timer disabled. Manual checks remain available under
+**Actions → Check stock and publish Duo Watch**.
 To stop alerts on one iPhone, tap **Turn off on this device** and remove or update
 the `PUSH_SUBSCRIPTIONS` secret. To remove the dashboard, unpublish GitHub Pages
 in repository **Settings → Pages**.
@@ -98,7 +101,9 @@ The active source is maintained directly in this repository:
 - `apple.mjs`: one stock request and validation of Apple's response.
 - `stock.mjs`: confirmed stock state, change detection, and alert grouping.
 - `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
-- `.github/workflows/timer.yml`: five-minute automatic trigger.
+- `.github/workflows/timer.yml`: legacy native timer; disable when using cron-job.org.
+- `automation.mjs`: distinguishes external timer, native timer, and manual requests.
+- `EXTERNAL_TIMER.md`: external timer configuration and verification.
 - `.github/workflows/stock.yml`: shared stock-check and publishing job, also runnable manually.
 - `app.js`: dashboard rendering and iPhone notification setup.
 - `health.mjs`: shared freshness rules and app health messages.

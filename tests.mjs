@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { parsePickup, fetchPickup } from "./apple.mjs";
 import { applyObservations, currentAlert } from "./stock.mjs";
+import { describeTrigger } from "./automation.mjs";
 import { describeHealth, displayStatus, STALE_AFTER_MS } from "./health.mjs";
 import { emptySnapshot, STORES, VARIANTS, watchKey } from "./config.mjs";
 const fixture = () =>
@@ -158,4 +159,21 @@ test("health distinguishes first check, source errors, and push failures", () =>
   data.snapshot.lastError = null;
   data.lastPush.failed = 1;
   assert.equal(describeHealth(data, now).state, "push-error");
+});
+
+test("external timer requests are identified without relabeling ordinary manual checks", () => {
+  assert.deepEqual(describeTrigger("workflow_dispatch", "cron-job.org"), {
+    type: "external-schedule",
+    automatic: true,
+    source: "cron-job.org",
+  });
+  assert.equal(describeTrigger("workflow_dispatch").automatic, false);
+  assert.equal(describeTrigger("workflow_dispatch", "unknown").automatic, false);
+  assert.equal(describeTrigger("push", "cron-job.org").automatic, false);
+  assert.equal(describeTrigger().type, "local");
+  assert.deepEqual(describeTrigger("schedule"), {
+    type: "schedule",
+    automatic: true,
+    source: "GitHub",
+  });
 });

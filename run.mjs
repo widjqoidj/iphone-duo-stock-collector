@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { execFileSync } from "node:child_process";
 import { randomUUID, createHash } from "node:crypto";
 import webpush from "web-push";
+import { describeTrigger } from "./automation.mjs";
 import { fetchPickup } from "./apple.mjs";
 import { applyObservations, currentAlert } from "./stock.mjs";
 import { STORES, VARIANTS, watchKey, emptySnapshot, POLL_MS } from "./config.mjs";
@@ -59,19 +60,21 @@ function createPendingAlert(alert, now) {
 
 function recordCheck(state, observations, now, siteUrl) {
   const { snapshot, alerts } = applyObservations(state.snapshot, observations, now);
+  const trigger = describeTrigger(process.env.GITHUB_EVENT_NAME, process.env.TIMER_SOURCE);
   state.snapshot = snapshot;
   state.history = [
     {
       at: now,
       verified: observations.filter((observation) => observation.status !== "unknown").length,
       error: snapshot.lastError,
-      trigger: process.env.GITHUB_EVENT_NAME || "local",
+      trigger: trigger.type,
     },
     ...state.history,
   ].slice(0, HISTORY_LIMIT);
 
-  if (process.env.GITHUB_EVENT_NAME === "schedule") {
+  if (trigger.automatic) {
     state.lastScheduledAt = now;
+    state.lastTimerSource = trigger.source;
   }
 
   for (const alert of alerts) {
@@ -250,7 +253,10 @@ function publishDashboard(state) {
         history: state.history,
         lastPush: state.lastPush,
         generatedAt: Date.now(),
-        monitor: { lastScheduledAt: state.lastScheduledAt ?? null },
+        monitor: {
+          lastScheduledAt: state.lastScheduledAt ?? null,
+          timerSource: state.lastTimerSource ?? null,
+        },
       },
       null,
       2,

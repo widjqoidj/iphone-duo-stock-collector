@@ -1,0 +1,7 @@
+{
+  "ref": "main",
+  "inputs": {
+    "send_test": false,
+    "timer_source": "cron-job.org"
+  }
+}

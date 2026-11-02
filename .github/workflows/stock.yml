@@ -6,6 +6,11 @@ on:
         description: Send a test notification to configured iPhones
         type: boolean
         default: false
+      timer_source:
+        description: Source of this workflow request
+        type: choice
+        options: [manual, cron-job.org]
+        default: manual
   push:
     branches: [main]
     paths-ignore: [state.json]
@@ -15,6 +20,10 @@ on:
         description: Send a test notification to configured iPhones
         type: boolean
         default: false
+      timer_source:
+        description: Source of this workflow request
+        type: string
+        default: manual
 permissions:
   contents: write
   pages: write
@@ -47,6 +56,7 @@ jobs:
           VAPID_KEYS: ${{ secrets.VAPID_KEYS }}
           PUSH_SUBSCRIPTIONS: ${{ secrets.PUSH_SUBSCRIPTIONS }}
           SEND_TEST: ${{ inputs.send_test || 'false' }}
+          TIMER_SOURCE: ${{ inputs.timer_source || 'manual' }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
