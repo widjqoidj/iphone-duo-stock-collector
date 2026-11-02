@@ -14,6 +14,7 @@ const PERMANENT_PUSH_ERRORS = new Set([400, 401, 403, 404, 410]);
 const PUBLIC_ASSETS = [
   "index.html",
   "app.js",
+  "health.mjs",
   "styles.css",
   "sw.js",
   "manifest.webmanifest",
@@ -64,9 +65,14 @@ function recordCheck(state, observations, now, siteUrl) {
       at: now,
       verified: observations.filter((observation) => observation.status !== "unknown").length,
       error: snapshot.lastError,
+      trigger: process.env.GITHUB_EVENT_NAME || "local",
     },
     ...state.history,
   ].slice(0, HISTORY_LIMIT);
+
+  if (process.env.GITHUB_EVENT_NAME === "schedule") {
+    state.lastScheduledAt = now;
+  }
 
   for (const alert of alerts) {
     state.pending.push(createPendingAlert(alert, now));
@@ -244,6 +250,7 @@ function publishDashboard(state) {
         history: state.history,
         lastPush: state.lastPush,
         generatedAt: Date.now(),
+        monitor: { lastScheduledAt: state.lastScheduledAt ?? null },
       },
       null,
       2,

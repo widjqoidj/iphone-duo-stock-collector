@@ -36,6 +36,12 @@ use a JSON array containing both subscription objects in `PUSH_SUBSCRIPTIONS`.
 - The target interval is **five minutes**, offset from the top of the hour.
   GitHub schedules are best effort and can be delayed or dropped under load.
 - The dashboard marks results stale after 15 minutes without confirmation.
+  It refreshes published data when reopened, after connectivity returns, and once
+  per minute while visible. It does not send extra Apple requests from the phone.
+- App health reports data freshness, the last timer-triggered run, and push
+  configuration separately. A successful manual check does not prove the timer
+  is working. If cloud checks are overdue, use **Run stock check → Run workflow**
+  in GitHub. Reloading the dashboard alone cannot restart the cloud checker.
 - A request failure never becomes a sold-out result; the previous confirmed state
   remains saved. The last 20 checks appear on the dashboard.
 - Alerts fire for first observed availability, restocks, and pickup-date changes.
@@ -90,6 +96,7 @@ The active source is maintained directly in this repository:
 - `stock.mjs`: confirmed stock state, change detection, and alert grouping.
 - `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
 - `app.js`: dashboard rendering and iPhone notification setup.
+- `health.mjs`: shared freshness rules and app health messages.
 - `sw.js`: background push notifications and notification links.
 - `index.html`, `styles.css`, manifest, and icons: the dashboard presentation.
 - `tests.mjs`: regression tests for parsing, stock transitions, and alerts.

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { parsePickup, fetchPickup } from "./apple.mjs";
 import { applyObservations, currentAlert } from "./stock.mjs";
+import { describeHealth, displayStatus, STALE_AFTER_MS } from "./health.mjs";
 import { emptySnapshot, STORES, VARIANTS, watchKey } from "./config.mjs";
 const fixture = () =>
   JSON.parse(readFileSync(new URL("./test-fixture.json", import.meta.url), "utf8"));
@@ -107,4 +108,54 @@ test("malformed responses and HTML errors never become unavailable", async () =>
     fetchPickup(async () => new Response("", { status: 429, headers: { "retry-after": "120" } })),
     /retry-after=120/,
   );
+});
+
+function healthFixture(now) {
+  return {
+    snapshot: { checkedAt: now, lastError: null },
+    lastPush: { configured: true, failed: 0 },
+    monitor: { lastScheduledAt: now },
+  };
+}
+
+test("old stock cannot appear current after reopening the app", () => {
+  const now = 2_000_000;
+  const watch = { status: "available", confirmed: "available", confirmedAt: now };
+  assert.equal(displayStatus(watch, now), "available");
+  assert.equal(displayStatus(watch, now + STALE_AFTER_MS), "available");
+  assert.equal(displayStatus(watch, now + STALE_AFTER_MS + 1), "unknown");
+  assert.equal(displayStatus({ ...watch, status: "unknown" }, now), "unknown");
+});
+
+test("manual stock success does not prove that automatic scheduling is healthy", () => {
+  const now = 2_000_000;
+  const data = healthFixture(now);
+  data.monitor.lastScheduledAt = null;
+  assert.equal(describeHealth(data, now).state, "schedule-pending");
+  data.monitor.lastScheduledAt = now - STALE_AFTER_MS - 1;
+  assert.equal(describeHealth(data, now).state, "schedule-pending");
+  data.monitor.lastScheduledAt = now;
+  assert.equal(describeHealth(data, now).state, "healthy");
+});
+
+test("overdue cloud checks explain that refreshing does not start an Apple request", () => {
+  const now = 2_000_000;
+  const data = healthFixture(now - STALE_AFTER_MS - 1);
+  const health = describeHealth(data, now);
+  assert.equal(health.state, "overdue");
+  assert.match(health.detail, /cannot start an Apple check/);
+  assert.match(health.detail, /Run workflow/);
+});
+
+test("health distinguishes first check, source errors, and push failures", () => {
+  const now = 2_000_000;
+  const data = healthFixture(now);
+  data.snapshot.checkedAt = null;
+  assert.equal(describeHealth(data, now).state, "starting");
+  data.snapshot.checkedAt = now;
+  data.snapshot.lastError = "Apple request failed";
+  assert.equal(describeHealth(data, now).state, "source-error");
+  data.snapshot.lastError = null;
+  data.lastPush.failed = 1;
+  assert.equal(describeHealth(data, now).state, "push-error");
 });

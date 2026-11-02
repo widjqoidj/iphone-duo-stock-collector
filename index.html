@@ -2,151 +2,200 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#173e32" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f5f5f7" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Duo Watch" />
     <title>Duo Watch — Pittsburgh</title>
     <meta
       name="description"
-      content="A free personal iPhone Duo pickup tracker for three Pittsburgh Apple Stores."
+      content="iPhone Duo pickup availability at three Pittsburgh Apple Stores."
     />
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icon-192.png" />
     <link rel="icon" href="./icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=2" />
-    <script src="./app.js" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=3" />
+    <script src="./app.js?v=3" type="module"></script>
   </head>
   <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <a class="brand" href="./"
-          ><span class="brand-icon">◎</span>Duo<span class="brand-light">Watch</span></a
-        >
-        <div class="private">$0 / month</div>
-      </header>
-      <main>
-        <div class="eyebrow"><span class="tiny-dot"></span>PITTSBURGH, PENNSYLVANIA</div>
-        <section class="hero">
-          <div>
-            <h1>iPhone Duo stock</h1>
-            <p>Pickup availability in Pittsburgh.</p>
-            <div class="product-tags">
-              <span>iPhone Duo</span><span>512GB</span><span>Unlocked</span
-              ><span>Either color</span>
+    <header class="topbar">
+      <nav aria-label="Main navigation">
+        <a class="brand" href="./" aria-label="Duo Watch home">
+          <svg class="app-mark" width="27" height="27" viewBox="0 0 28 28" aria-hidden="true">
+            <rect x="1" y="1" width="26" height="26" rx="7" fill="currentColor" />
+            <rect x="7" y="7" width="7" height="14" rx="2" fill="white" />
+            <rect x="15" y="7" width="6" height="14" rx="2" fill="white" opacity=".7" />
+          </svg>
+          Duo Watch
+        </a>
+        <span class="nav-region">Pittsburgh</span>
+        <a class="nav-link" href="#notifications">Notifications</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Apple Store pickup</p>
+        <h1 id="page-title">iPhone Duo<span>.</span></h1>
+        <p class="hero-description">512GB. Unlocked. Either color.</p>
+        <div class="product-colors" aria-label="Star White and Night Sky">
+          <span class="color-chip"><i style="--swatch: #e9e7e1"></i>Star White</span>
+          <span class="color-chip"><i style="--swatch: #333c50"></i>Night Sky</span>
+        </div>
+      </section>
+
+      <section class="summary-strip" aria-label="Stock summary">
+        <div>
+          <p class="section-label">PITTSBURGH · 3 STORES</p>
+          <h2 id="summary" aria-live="polite">Loading stock results…</h2>
+          <p class="last-check">Last cloud check <time id="checked">—</time></p>
+        </div>
+        <button class="secondary-button refresh-button" id="refresh">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 20 20"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            aria-hidden="true"
+          >
+            <path
+              d="M16 8a6.2 6.2 0 1 0 .1 4M16 3v5h-5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Refresh results
+        </button>
+      </section>
+      <div id="fetch-error" class="message error-message" role="alert" hidden></div>
+      <div id="message" class="message" role="status" hidden></div>
+
+      <div class="content-grid">
+        <div class="stock-column">
+          <section aria-labelledby="stores-heading">
+            <div class="section-heading">
+              <h2 id="stores-heading">Your stores</h2>
+              <span>512GB · Unlocked</span>
             </div>
-          </div>
-          <div class="phone-art" aria-hidden="true">
-            <div class="radar-ring ring-1"></div>
-            <div class="radar-ring ring-2"></div>
-            <div class="fold-phone">
-              <div class="phone-inner">
-                <div class="phone-clock">9:41</div>
-                <div class="phone-orb"></div>
-              </div>
-              <div class="phone-fold"></div>
+            <div class="store-list" id="stores" aria-busy="true">
+              <div class="card loading-card">Loading saved availability…</div>
             </div>
-          </div>
-        </section>
-        <section class="summary-strip">
-          <div><span class="summary-dot"></span><b id="summary">Loading saved stock…</b></div>
-          <span class="last-check" id="checked">Waiting for cloud results</span>
-        </section>
-        <div id="message" class="message" role="status" hidden></div>
-        <div class="content-grid">
-          <div>
-            <section>
-              <div class="section-heading">
-                <div>
-                  <h2>Stores <span class="count">03</span></h2>
-                </div>
-                <button class="text-button" id="refresh">↻ Refresh</button>
+          </section>
+          <section class="history-section" aria-labelledby="history-heading">
+            <div class="section-heading">
+              <h2 id="history-heading">Recent checks</h2>
+              <span>Eastern Time</span>
+            </div>
+            <div id="history" class="card history-list"></div>
+          </section>
+        </div>
+
+        <aside>
+          <section class="card monitor-card" aria-labelledby="monitor-title" aria-live="polite">
+            <div class="card-heading">
+              <span class="status-dot" id="monitor-dot"></span>
+              <h2 id="monitor-title">Checking app health…</h2>
+            </div>
+            <p id="monitor-description">Loading the latest cloud check.</p>
+            <dl class="health-details">
+              <div>
+                <dt>Last check</dt>
+                <dd id="monitor-checked">—</dd>
               </div>
-              <div class="store-list" id="stores"></div>
-            </section>
-            <section class="history">
-              <div class="section-heading">
-                <div><h2>Recent checks</h2></div>
-                <span class="muted-label">EASTERN TIME</span>
+              <div>
+                <dt>Automatic timer</dt>
+                <dd id="monitor-schedule">Not verified</dd>
               </div>
-              <div id="history"></div>
-            </section>
-          </div>
-          <aside>
-            <section class="notification-card">
-              <span class="card-icon"
-                ><svg
-                  width="22"
-                  height="22"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                >
-                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></svg
-              ></span>
-              <h2>Notifications</h2>
-              <p>Receive an alert when a matching iPhone is available for pickup.</p>
-              <button class="primary-button" id="connect">Enable notifications</button>
-              <div id="connection" hidden>
-                <p style="font-size: 12px; line-height: 1.7; margin-top: 16px">
-                  One-time connection: copy this device’s setup code into the repository’s
-                  <b>PUSH_SUBSCRIPTIONS</b> Actions secret. Keep the code private.
+              <div>
+                <dt>Target interval</dt>
+                <dd>5 minutes</dd>
+              </div>
+              <div>
+                <dt>Push service</dt>
+                <dd id="monitor-push">Checking…</dd>
+              </div>
+            </dl>
+            <p id="source-error" class="source-error" hidden></p>
+            <a
+              class="text-link"
+              id="cloud-check-link"
+              href="https://github.com/widjqoidj/iphone-duo-stock-collector/actions/workflows/stock.yml"
+              target="_blank"
+              rel="noreferrer"
+              >Run stock check <span aria-hidden="true">↗</span></a
+            >
+            <p class="card-footnote">
+              Refresh reloads saved results. Run stock check opens GitHub to start a new Apple
+              check.
+            </p>
+          </section>
+
+          <section
+            class="card notification-card"
+            id="notifications"
+            aria-labelledby="notifications-heading"
+          >
+            <div class="notification-icon" aria-hidden="true">
+              <svg
+                width="23"
+                height="23"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.6"
+              >
+                <path
+                  d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <h2 id="notifications-heading">Pickup alerts.</h2>
+            <p>Get a notification when a matching iPhone becomes available.</p>
+            <p id="device-status" class="device-status">Checking this device…</p>
+            <button class="primary-button" id="connect">Enable notifications</button>
+            <div id="connection" hidden>
+              <details class="setup-details">
+                <summary>Device connection settings</summary>
+                <p>
+                  For a new device, save its setup code as the
+                  <code>PUSH_SUBSCRIPTIONS</code> Actions secret. Keep the code private.
                 </p>
-                <button class="primary-button" id="copy">Copy iPhone setup code</button>
+                <button class="secondary-button" id="copy">Copy iPhone setup code</button>
                 <div class="notification-actions">
                   <a id="secret-link" target="_blank" rel="noreferrer"
                     >Open GitHub secret settings ↗</a
-                  ><a id="test-link" target="_blank" rel="noreferrer"
+                  >
+                  <a id="test-link" target="_blank" rel="noreferrer"
                     >Open workflow to send a test ↗</a
-                  ><button id="disconnect">Turn off on this device</button>
+                  >
+                  <button class="disconnect-button" id="disconnect">Turn off on this device</button>
                 </div>
-              </div>
-              <div class="install-guide">
-                <div class="install-guide-title"><b>One-time iPhone setup</b></div>
-                <ol>
-                  <li><span>1</span>Safari → Share → Add to Home Screen.</li>
-                  <li><span>2</span>Open its icon and allow notifications.</li>
-                  <li><span>3</span>Copy setup code into the GitHub secret.</li>
-                </ol>
-                <small
-                  >iOS 16.4 or later. Device details are stored in your Actions secret, never in the
-                  public repository.</small
-                >
-              </div>
-              <small class="delivery-note" id="push-status"></small>
-            </section>
-            <section class="monitor-card">
-              <div class="monitor-title">
-                <span class="tiny-dot" id="monitor-dot"></span>
-                <h3 id="monitor-title">Cloud checker</h3>
-              </div>
-              <p>
-                Checks run on free GitHub-hosted runners. The five-minute schedule is a target;
-                GitHub can delay runs.
-              </p>
-              <dl>
-                <div>
-                  <dt>Target interval</dt>
-                  <dd>5 minutes</dd>
-                </div>
-                <div>
-                  <dt>Hosting and runner</dt>
-                  <dd>Free public GitHub services</dd>
-                </div>
-              </dl>
-              <p id="source-error"></p>
-            </section>
-            <p class="fine-print">
-              Pickup stock can change quickly. Confirm on Apple before making a trip.
-            </p>
-          </aside>
-        </div>
-        <footer>
-          <span class="footer-brand">◎ Duo Watch</span><span>Not affiliated with Apple.</span
+              </details>
+            </div>
+            <details class="setup-details" id="install-guide">
+              <summary>How to set up on iPhone</summary>
+              <ol>
+                <li>In Safari, tap Share → Add to Home Screen.</li>
+                <li>Open the app icon and allow notifications.</li>
+                <li>Copy the setup code into the GitHub secret, then send a test.</li>
+              </ol>
+              <p>Requires iOS 16.4 or later.</p>
+            </details>
+            <p class="card-footnote" id="push-status"></p>
+          </section>
+          <p class="cost-note">$0 additional cost · GitHub Pages &amp; Actions</p>
+        </aside>
+      </div>
+      <footer>
+        <p>Confirm pickup on Apple before making a trip.</p>
+        <div>
+          <span>Independent project. Not affiliated with Apple.</span
           ><a id="repo-link" target="_blank" rel="noreferrer">Source &amp; instructions ↗</a>
-        </footer>
-      </main>
-    </div>
+        </div>
+      </footer>
+    </main>
   </body>
 </html>

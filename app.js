@@ -1,3 +1,5 @@
+import { describeHealth, displayStatus } from "./health.mjs?v=3";
+
 const stores = [
   { id: "R096", name: "Shadyside", address: "5436 Walnut Street", slug: "shadyside" },
   { id: "R413", name: "Ross Park", address: "1000 Ross Park Mall Drive", slug: "rosspark" },
@@ -13,11 +15,13 @@ const variants = [
   { id: "MK1H4LL/A", color: "Night Sky", slug: "night-sky", shade: "#333c50" },
 ];
 
-const STALE_AFTER_MS = 15 * 60_000;
 const DASHBOARD_REFRESH_MS = 60_000;
 const element = (id) => document.getElementById(id);
 let config;
 let subscription;
+let dashboardRefresh;
+let cloudPushConfigured = false;
+let lastDashboardData;
 
 function escapeHtml(value) {
   const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
@@ -46,14 +50,14 @@ function updateConnection(currentSubscription) {
   subscription = currentSubscription;
   element("connection").hidden = !subscription;
   element("connect").textContent = subscription
-    ? "Device enabled — finish GitHub connection"
+    ? "Notifications enabled on this device"
     : "Enable notifications";
-}
-
-function displayStatus(watch) {
-  const stale =
-    !watch || watch.status === "unknown" || Date.now() - (watch.confirmedAt ?? 0) > STALE_AFTER_MS;
-  return stale ? "unknown" : watch.confirmed;
+  element("connect").hidden = !!subscription;
+  element("device-status").textContent = subscription
+    ? cloudPushConfigured
+      ? "Device permission enabled · Cloud push configured"
+      : "Device permission enabled · Finish cloud connection below"
+    : "Enable alerts on this device.";
 }
 
 function renderVariant(store, variant, snapshot) {
@@ -64,7 +68,7 @@ function renderVariant(store, variant, snapshot) {
       ? "Available for pickup"
       : status === "unavailable"
         ? "Currently unavailable"
-        : "Needs a fresh check";
+        : "Awaiting update";
   const lastConfirmed =
     watch && status === "unknown" && watch.confirmedAt
       ? `<small class="pickup-detail">Last confirmed ${escapeHtml(watch.confirmed)}: ${formatTime(watch.confirmedAt)}</small>`
@@ -86,11 +90,11 @@ function renderVariant(store, variant, snapshot) {
     </div>`;
 }
 
-function renderStore(store, index, snapshot) {
+function renderStore(store, snapshot) {
   return `
     <article class="store-card">
       <div class="store-head">
-        <div class="store-number">0${index + 1}</div>
+        <div class="store-location" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 0 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
         <div class="store-title"><h3>${store.name}</h3><p>${store.address}</p></div>
         <a class="store-link" href="https://www.apple.com/retail/${store.slug}/"
            target="_blank" rel="noreferrer" aria-label="Visit Apple ${store.name}">↗</a>
@@ -100,9 +104,7 @@ function renderStore(store, index, snapshot) {
 }
 
 function renderStock(snapshot) {
-  element("stores").innerHTML = stores
-    .map((store, index) => renderStore(store, index, snapshot))
-    .join("");
+  element("stores").innerHTML = stores.map((store) => renderStore(store, snapshot)).join("");
   const availableCount = stores.reduce(
     (count, store) =>
       count +
@@ -111,18 +113,18 @@ function renderStock(snapshot) {
       ).length,
     0,
   );
+  const hasUnknownResults = stores.some((store) =>
+    variants.some(
+      (variant) => displayStatus(snapshot.watches[store.id + ":" + variant.id]) === "unknown",
+    ),
+  );
+  element("stores").setAttribute("aria-busy", "false");
   element("summary").textContent = availableCount
     ? `${availableCount} pickup option${availableCount === 1 ? "" : "s"} found`
-    : snapshot.lastError
-      ? "Stock checks need attention"
-      : "No pickup availability yet";
+    : hasUnknownResults
+      ? "Waiting for updated stock"
+      : "No pickup availability right now";
   element("checked").textContent = formatTime(snapshot.checkedAt);
-  element("source-error").textContent = snapshot.lastError ?? "";
-
-  const fresh = Date.now() - (snapshot.checkedAt ?? 0) < STALE_AFTER_MS;
-  element("monitor-title").textContent =
-    fresh && !snapshot.lastError ? "Cloud checker connected" : "Cloud checker needs attention";
-  element("monitor-dot").classList.toggle("amber", !fresh || !!snapshot.lastError);
 }
 
 function renderHistory(history) {
@@ -134,7 +136,7 @@ function renderHistory(history) {
           <span class="history-icon ${check.error ? "" : "ok"}">${check.error ? "!" : "✓"}</span>
           <div>
             <b>${check.error ? "Check needs attention" : "All three stores checked"}</b>
-            <small>GitHub Actions · ${check.verified} of 6 results verified</small>
+            <small>${check.trigger === "schedule" ? "Automatic check" : "Cloud check"} · ${check.verified} of 6 results verified</small>
           </div>
           <time>${formatTime(check.at)}</time>
         </div>`,
@@ -142,23 +144,80 @@ function renderHistory(history) {
     .join("");
 }
 
-async function refreshDashboard() {
+function renderHealth(data) {
+  const health = describeHealth(data);
+  element("monitor-title").textContent = health.title;
+  element("monitor-description").textContent = health.detail;
+  element("monitor-dot").classList.toggle("amber", health.state !== "healthy");
+  element("monitor-dot").classList.toggle(
+    "error",
+    ["source-error", "push-error"].includes(health.state),
+  );
+  element("monitor-checked").textContent = formatTime(data.snapshot.checkedAt);
+  element("monitor-schedule").textContent = data.monitor?.lastScheduledAt
+    ? formatTime(data.monitor.lastScheduledAt)
+    : "No run recorded";
+  element("monitor-push").textContent = data.lastPush?.configured
+    ? data.lastPush.failed > 0
+      ? "Delivery error"
+      : "Configured"
+    : "Not configured";
+  element("source-error").textContent = data.snapshot.lastError ?? "";
+  element("source-error").hidden = !data.snapshot.lastError;
+  cloudPushConfigured = !!data.lastPush?.configured;
+  updateConnection(subscription);
+  element("push-status").textContent = cloudPushConfigured
+    ? "Cloud push is configured. Device connection settings are only needed when adding or replacing a device."
+    : "Complete the one-time GitHub secret connection to receive alerts.";
+}
+
+async function loadDashboard() {
+  element("refresh").disabled = true;
+  element("refresh").setAttribute("aria-busy", "true");
+  if (lastDashboardData) {
+    renderStock(lastDashboardData.snapshot);
+    renderHealth(lastDashboardData);
+  }
   try {
-    const response = await fetch("./status.json?t=" + Date.now(), { cache: "no-store" });
+    const response = await fetch("./status.json?t=" + Date.now(), {
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    });
     if (!response.ok) {
       throw new Error(
-        "Cloud results are not published yet. Try again after the first workflow completes.",
+        "Cloud results could not load. Check your connection and tap Refresh results.",
       );
     }
     const data = await response.json();
+    lastDashboardData = data;
     renderStock(data.snapshot);
     renderHistory(data.history);
-    element("push-status").textContent = data.lastPush?.configured
-      ? `Cloud push configured. Last run: ${data.lastPush.accepted} accepted, ${data.lastPush.failed} failed.`
-      : "Finish the one-time GitHub secret connection to receive alerts.";
+    renderHealth(data);
+    element("fetch-error").hidden = true;
   } catch (error) {
-    showMessage(error.message);
+    element("fetch-error").hidden = false;
+    element("fetch-error").textContent =
+      error.name === "TimeoutError"
+        ? "Loading took too long. Check your connection and tap Refresh results."
+        : error.message;
+    element("monitor-title").textContent = "Results could not load";
+    element("monitor-description").textContent =
+      "The app could not reach the published cloud results. This does not confirm an Apple stock change.";
+    element("monitor-dot").classList.add("amber");
+  } finally {
+    element("refresh").disabled = false;
+    element("refresh").setAttribute("aria-busy", "false");
   }
+}
+
+function refreshDashboard() {
+  // Resume events and the one-minute timer may arrive together; share one request.
+  if (!dashboardRefresh) {
+    dashboardRefresh = loadDashboard().finally(() => {
+      dashboardRefresh = null;
+    });
+  }
+  return dashboardRefresh;
 }
 
 const registration =
@@ -172,6 +231,7 @@ async function initializeNotifications() {
     element("repo-link").href = config.repoUrl;
     element("secret-link").href = config.repoUrl + "/settings/secrets/actions/new";
     element("test-link").href = config.repoUrl + "/actions/workflows/stock.yml";
+    element("cloud-check-link").href = config.repoUrl + "/actions/workflows/stock.yml";
     const serviceWorker = await registration;
     if (serviceWorker) {
       updateConnection(await serviceWorker.pushManager.getSubscription());
@@ -242,9 +302,17 @@ async function disconnectNotifications() {
 }
 
 element("refresh").onclick = refreshDashboard;
-await initializeNotifications();
+initializeNotifications();
 element("connect").onclick = enableNotifications;
 element("copy").onclick = copySetupCode;
 element("disconnect").onclick = disconnectNotifications;
 refreshDashboard();
-setInterval(refreshDashboard, DASHBOARD_REFRESH_MS);
+setInterval(() => {
+  if (!document.hidden) refreshDashboard();
+}, DASHBOARD_REFRESH_MS);
+// Home Screen apps can remain suspended for hours; reload results when reopened.
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) refreshDashboard();
+});
+window.addEventListener("pageshow", refreshDashboard);
+window.addEventListener("online", refreshDashboard);
