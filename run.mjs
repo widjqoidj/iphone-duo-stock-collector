@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { execFileSync } from "node:child_process";
 import { randomUUID, createHash } from "node:crypto";
 import webpush from "web-push";
+import { recordDailyTrend } from "./trend.mjs";
 import { describeTrigger } from "./automation.mjs";
 import { fetchPickup } from "./apple.mjs";
 import { applyObservations, currentAlert } from "./stock.mjs";
@@ -16,6 +17,9 @@ const PUBLIC_ASSETS = [
   "index.html",
   "app.js",
   "health.mjs",
+  "trend.mjs",
+  "config.mjs",
+  "trend-chart.js",
   "styles.css",
   "sw.js",
   "manifest.webmanifest",
@@ -59,6 +63,7 @@ function createPendingAlert(alert, now) {
 }
 
 function recordCheck(state, observations, now, siteUrl) {
+  state.trend = recordDailyTrend(state.trend, state.snapshot, observations, now);
   const { snapshot, alerts } = applyObservations(state.snapshot, observations, now);
   const trigger = describeTrigger(process.env.GITHUB_EVENT_NAME, process.env.TIMER_SOURCE);
   state.snapshot = snapshot;
@@ -251,6 +256,7 @@ function publishDashboard(state) {
       {
         snapshot: state.snapshot,
         history: state.history,
+        trend: state.trend,
         lastPush: state.lastPush,
         generatedAt: Date.now(),
         monitor: {

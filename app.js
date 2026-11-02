@@ -1,3 +1,4 @@
+import { renderTrend } from "./trend-chart.js?v=5";
 import { describeHealth, displayStatus } from "./health.mjs?v=4";
 
 const stores = [
@@ -178,6 +179,7 @@ async function loadDashboard() {
   if (lastDashboardData) {
     renderStock(lastDashboardData.snapshot);
     renderHealth(lastDashboardData);
+    renderTrend(lastDashboardData.trend);
   }
   try {
     const response = await fetch("./status.json?t=" + Date.now(), {
@@ -193,6 +195,7 @@ async function loadDashboard() {
     lastDashboardData = data;
     renderStock(data.snapshot);
     renderHistory(data.history);
+    renderTrend(data.trend);
     renderHealth(data);
     element("fetch-error").hidden = true;
   } catch (error) {

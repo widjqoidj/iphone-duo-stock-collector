@@ -207,5 +207,37 @@
     "configured": true
   },
   "lastScheduledAt": 1793657440725,
-  "lastTimerSource": "cron-job.org"
+  "lastTimerSource": "cron-job.org",
+  "trend": {
+    "startedAt": 1793571517310,
+    "lastCheckAt": 1793657440725,
+    "days": {
+      "2026-11-01": {
+        "restocks": 0,
+        "checks": 49,
+        "verifiedResults": 294,
+        "completeChecks": 49,
+        "firstCheckAt": 1793571517310,
+        "lastCheckAt": 1793595326339,
+        "byStore": {
+          "R096": 0,
+          "R413": 0,
+          "R147": 0
+        }
+      },
+      "2026-11-02": {
+        "restocks": 0,
+        "checks": 207,
+        "verifiedResults": 1242,
+        "completeChecks": 207,
+        "firstCheckAt": 1793595674384,
+        "lastCheckAt": 1793657440725,
+        "byStore": {
+          "R096": 0,
+          "R413": 0,
+          "R147": 0
+        }
+      }
+    }
+  }
 }

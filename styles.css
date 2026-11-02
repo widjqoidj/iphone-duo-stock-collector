@@ -762,3 +762,206 @@ footer a {
       opacity 0.15s ease;
   }
 }
+
+/* Daily restock history uses the same card and type scale as the stock list. */
+.trend-section {
+  margin-top: 32px;
+}
+.trend-card {
+  padding: 25px 26px 22px;
+}
+.trend-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.trend-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trend-summary strong {
+  font-size: 35px;
+  line-height: 1;
+  letter-spacing: -1.4px;
+  font-weight: 600;
+}
+.trend-summary > div > span,
+.trend-period {
+  font-size: 11px;
+  color: var(--secondary);
+}
+.trend-period {
+  white-space: nowrap;
+}
+.trend-note {
+  margin: 17px 0 14px;
+  color: var(--secondary);
+  font-size: 11px;
+  line-height: 1.6;
+}
+.trend-chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.trend-gridline {
+  stroke: #ececf0;
+  stroke-width: 1;
+}
+.trend-axis-label {
+  font-family: inherit;
+  font-size: 10px;
+  fill: #6e6e73;
+}
+.trend-hit-area {
+  fill: transparent;
+  cursor: pointer;
+}
+.trend-hit-area:hover,
+.trend-hit-area.selected {
+  fill: #edf4ff;
+}
+.trend-bar,
+.trend-zero {
+  fill: var(--blue);
+  pointer-events: none;
+}
+.trend-missing {
+  stroke: #bcbcc2;
+  stroke-width: 2;
+  stroke-dasharray: 1 1;
+  pointer-events: none;
+}
+.trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+  margin: 9px 0 21px;
+  color: var(--secondary);
+  font-size: 10px;
+}
+.trend-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trend-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.legend-observed {
+  background: var(--blue);
+}
+.legend-missing {
+  background: repeating-linear-gradient(135deg, #bcbcc2 0 1px, transparent 1px 3px);
+}
+.trend-day-picker {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+.trend-day-picker label {
+  color: var(--secondary);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.trend-day-picker select {
+  font: inherit;
+  font-size: 11px;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #e8e8ed;
+  border-radius: 10px;
+  color: #1d1d1f;
+  background: #f5f5f7;
+}
+.trend-day-picker select:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+.trend-day-detail {
+  margin-top: 18px;
+}
+.trend-day-heading {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.trend-day-heading b {
+  font-weight: 600;
+}
+.trend-today {
+  font-size: 9px;
+  color: var(--blue);
+  border-radius: 5px;
+  background: #edf4ff;
+  padding: 4px 6px;
+}
+.trend-store-totals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+.trend-store-totals > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.trend-store-totals span {
+  color: var(--secondary);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.trend-store-totals b {
+  font-size: 17px;
+  font-weight: 500;
+}
+.trend-day-detail > p {
+  font-size: 10px;
+  color: var(--secondary);
+  line-height: 1.7;
+  margin: 15px 0 17px;
+}
+@media (max-width: 680px) {
+  .trend-card {
+    padding: 23px 19px;
+  }
+  .trend-day-picker {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .trend-day-picker select {
+    font-size: 12px;
+  }
+  .trend-period {
+    font-size: 10px;
+  }
+  .trend-store-totals {
+    gap: 8px;
+  }
+}
+
+.nav-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.nav-actions .nav-link {
+  margin-left: 0;
+}
+.trend-section {
+  scroll-margin-top: 90px;
+}

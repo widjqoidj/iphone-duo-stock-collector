@@ -14,8 +14,8 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="apple-touch-icon" href="./icon-192.png" />
     <link rel="icon" href="./icon-192.png" />
-    <link rel="stylesheet" href="./styles.css?v=3" />
-    <script src="./app.js?v=4" type="module"></script>
+    <link rel="stylesheet" href="./styles.css?v=5" />
+    <script src="./app.js?v=5" type="module"></script>
   </head>
   <body>
     <header class="topbar">
@@ -29,7 +29,10 @@
           Duo Watch
         </a>
         <span class="nav-region">Pittsburgh</span>
-        <a class="nav-link" href="#notifications">Notifications</a>
+        <div class="nav-actions">
+          <a class="nav-link" href="#restock-trend">Trends</a
+          ><a class="nav-link" href="#notifications">Notifications</a>
+        </div>
       </nav>
     </header>
     <main>
@@ -80,6 +83,36 @@
             </div>
             <div class="store-list" id="stores" aria-busy="true">
               <div class="card loading-card">Loading saved availability…</div>
+            </div>
+          </section>
+          <section id="restock-trend" class="trend-section" aria-labelledby="trend-heading">
+            <div class="section-heading">
+              <h2 id="trend-heading">Restock trend</h2>
+              <span>Daily · Eastern Time</span>
+            </div>
+            <div class="card trend-card">
+              <div class="trend-summary">
+                <div>
+                  <strong id="trend-total">—</strong><span>observed restocks · 30 days</span>
+                </div>
+                <span class="trend-period" id="trend-period">Loading history…</span>
+              </div>
+              <p class="trend-note" id="trend-note"></p>
+              <div id="trend-chart" class="trend-chart"></div>
+              <div class="trend-legend">
+                <span><i class="legend-observed"></i>Observed</span
+                ><span><i class="legend-missing"></i>No verified data</span
+                ><span>Today is in progress</span>
+              </div>
+              <div class="trend-day-picker">
+                <label for="trend-day">Day details</label
+                ><select id="trend-day" aria-describedby="trend-day-detail"></select>
+              </div>
+              <div id="trend-day-detail" class="trend-day-detail" aria-live="polite"></div>
+              <p class="card-footnote">
+                One restock is one store/color changing from unavailable to available. Changes
+                between checks may be missed. Daily bars roll over at midnight Eastern Time.
+              </p>
             </div>
           </section>
           <section class="history-section" aria-labelledby="history-heading">

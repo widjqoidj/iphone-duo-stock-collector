@@ -60,6 +60,26 @@ use a JSON array containing both subscription objects in `PUSH_SUBSCRIPTIONS`.
 - If an expired subscription fails, turn it off in the app, enable it again, and
   replace `PUSH_SUBSCRIPTIONS` with the new setup code.
 
+## Daily restock trend
+
+The dashboard shows the last 30 Eastern Time calendar days, with today marked
+in progress. Each count is one store/color changing from confirmed unavailable
+to available. First-seen availability, pickup-date changes, unchanged stock, and
+unknown-to-available recovery from previously available stock do not count.
+Changes that happen between checks may be missed.
+
+Daily totals are saved with stock state for up to 365 days, independently of the
+20-check activity list. The existing cloud checks update today's total and roll
+into a new daily bar after midnight Eastern Time; no extra Apple requests or
+paid services are used. Missing or entirely unverified days are shown separately
+from verified zero-restock days. Select a day to see store totals and check coverage.
+
+Run `node scripts/backfill-trend.mjs` from a full repository checkout to rebuild
+historical totals from saved `state.json` snapshots. It deduplicates repeated
+saves of a check and preserves the current stock and notification state. Commit
+the resulting state with the feature deployment. Normal cloud runs only append
+to the stored totals; they do not require full Git history.
+
 ## Free-only configuration
 
 Keep the repository **public**, `runs-on: ubuntu-latest`, the default `github.io`
@@ -100,6 +120,8 @@ The active source is maintained directly in this repository:
 - `config.mjs`: stores, product variants, and the five-minute polling interval.
 - `apple.mjs`: one stock request and validation of Apple's response.
 - `stock.mjs`: confirmed stock state, change detection, and alert grouping.
+- `trend.mjs` and `trend-chart.js`: daily restock aggregation and interactive histogram.
+- `scripts/backfill-trend.mjs`: rebuilds daily totals from saved repository history.
 - `run.mjs`: cloud job orchestration, state persistence, push delivery, and publishing.
 - `.github/workflows/timer.yml`: legacy native timer; disable when using cron-job.org.
 - `automation.mjs`: distinguishes external timer, native timer, and manual requests.
