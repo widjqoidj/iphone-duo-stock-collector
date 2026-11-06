@@ -3,87 +3,87 @@
     "watches": {
       "R096:MK1G4LL/A": {
         "key": "R096:MK1G4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       },
       "R096:MK1H4LL/A": {
         "key": "R096:MK1H4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       },
       "R413:MK1G4LL/A": {
         "key": "R413:MK1G4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       },
       "R413:MK1H4LL/A": {
         "key": "R413:MK1H4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       },
       "R147:MK1G4LL/A": {
         "key": "R147:MK1G4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       },
       "R147:MK1H4LL/A": {
         "key": "R147:MK1H4LL/A",
-        "status": "unknown",
-        "quote": "Check failed",
+        "status": "unavailable",
+        "quote": "Currently unavailable",
         "pickup": "",
-        "error": "Apple returned HTML or an unsupported response, not pickup JSON.",
         "confirmed": "unavailable",
-        "confirmedAt": 1793926876645,
-        "attemptedAt": 1793927436794,
+        "confirmedAt": 1793927740645,
+        "attemptedAt": 1793927740645,
         "version": 1,
-        "failures": 2,
+        "failures": 0,
         "incident": false
       }
     },
-    "checkedAt": 1793927436794,
-    "lastError": "Apple returned HTML or an unsupported response, not pickup JSON."
+    "checkedAt": 1793927740645,
+    "lastError": null
   },
   "history": [
+    {
+      "at": 1793927740645,
+      "verified": 6,
+      "error": null,
+      "trigger": "external-schedule"
+    },
     {
       "at": 1793927436794,
       "verified": 0,
@@ -197,12 +197,6 @@
       "verified": 6,
       "error": null,
       "trigger": "external-schedule"
-    },
-    {
-      "at": 1793921726248,
-      "verified": 6,
-      "error": null,
-      "trigger": "external-schedule"
     }
   ],
   "pending": [],
@@ -212,11 +206,11 @@
     "failed": 0,
     "configured": true
   },
-  "lastScheduledAt": 1793927436794,
+  "lastScheduledAt": 1793927740645,
   "lastTimerSource": "cron-job.org",
   "trend": {
     "startedAt": 1793571517310,
-    "lastCheckAt": 1793927436794,
+    "lastCheckAt": 1793927740645,
     "days": {
       "2026-11-01": {
         "restocks": 0,
@@ -272,11 +266,11 @@
       },
       "2026-11-05": {
         "restocks": 0,
-        "checks": 240,
-        "verifiedResults": 1428,
-        "completeChecks": 238,
+        "checks": 241,
+        "verifiedResults": 1434,
+        "completeChecks": 239,
         "firstCheckAt": 1793854878019,
-        "lastCheckAt": 1793927436794,
+        "lastCheckAt": 1793927740645,
         "byStore": {
           "R096": 0,
           "R413": 0,
